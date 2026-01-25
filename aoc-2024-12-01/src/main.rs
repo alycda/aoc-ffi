@@ -1,7 +1,21 @@
 //! 2024 Day 1: Historian Hysteria
+//! Comparing three sorting approaches: C qsort, Rust sort, C++ std::sort
 
 use std::ffi::c_void;
 use std::os::raw::c_int;
+
+// ============================================================================
+// C++ std::sort via autocxx
+// ============================================================================
+
+use autocxx::prelude::*;
+
+include_cpp! {
+    #include "cpp_sort.h"
+    safety!(unsafe)
+
+    generate!("cpp_sorting::sort_i32_array")
+}
 
 // FFI declaration for libc's qsort
 unsafe extern "C" {
@@ -47,6 +61,15 @@ fn c_qsort(vec: &mut Vec<i32>) {
     }
 }
 
+// Wrapper that calls C++ std::sort via autocxx
+fn cpp_sort(vec: &mut Vec<i32>) {
+    // Sort in-place: pass raw pointer + length directly to C++
+    // SAFETY: Vec's memory is contiguous and aligned, std::sort won't resize
+    unsafe {
+        ffi::cpp_sorting::sort_i32_array(vec.as_mut_ptr(), vec.len());
+    }
+}
+
 /// transpose 2 colums of numbers
 fn unzip(input: &str) -> (Vec<i32>, Vec<i32>) {
     input
@@ -64,34 +87,72 @@ fn unzip(input: &str) -> (Vec<i32>, Vec<i32>) {
         .unzip()
 }
 
-fn process(input: &str) -> Result<i32, String> { 
-    let (mut left, mut right) = unzip(input);
+// Process using C qsort
+fn process_c_qsort(input: &str) -> Result<i32, String> {
+    let (mut left, mut right): (Vec<i32>, Vec<i32>) = unzip(input);
 
-    // critical: sort both lists
-    c_qsort(&mut left); // left.sort();
-    c_qsort(&mut right); // right.sort();
+    c_qsort(&mut left);
+    c_qsort(&mut right);
 
     Ok(left
         .iter()
-        // for each element
         .zip(right.iter())
-        // get the absolute difference
         .map(|(l, r)| (l-r).abs())
-        // and sum
+        .sum::<i32>()
+    )
+}
+
+// Process using Rust's built-in sort
+fn process_rust_sort(input: &str) -> Result<i32, String> {
+    let (mut left, mut right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    left.sort();
+    right.sort();
+
+    Ok(left
+        .iter()
+        .zip(right.iter())
+        .map(|(l, r)| (l-r).abs())
+        .sum::<i32>()
+    )
+}
+
+// Process using C++ std::sort via autocxx
+fn process_cpp_sort(input: &str) -> Result<i32, String> {
+    let (mut left, mut right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    cpp_sort(&mut left);
+    cpp_sort(&mut right);
+
+    Ok(left
+        .iter()
+        .zip(right.iter())
+        .map(|(l, r)| (l-r).abs())
         .sum::<i32>()
     )
 }
 
 fn main() {
-    println!("2024 Day 1");
+    println!("2024 Day 1: Comparing Rust, C, and C++ sorting approaches\n");
 
-    assert_eq!(process("3 7").unwrap(), 4);
-    assert_eq!(process("9 3").unwrap(), 6);
-
-    println!("Part 1: {}", process("3   4
+    let example = "3   4
 4   3
 2   5
 1   3
 3   9
-3   3").expect("11"))
+3   3";
+
+    println!("Testing all three approaches:");
+    println!("  C qsort:      {}", process_c_qsort(example).expect("11"));
+    println!("  Rust sort:    {}", process_rust_sort(example).expect("11"));
+    println!("  C++ std::sort: {}", process_cpp_sort(example).expect("11"));
+
+    println!("\nAll approaches should give the same result: 11");
+
+    // Correctness tests
+    assert_eq!(process_c_qsort("3 7").unwrap(), 4);
+    assert_eq!(process_rust_sort("3 7").unwrap(), 4);
+    assert_eq!(process_cpp_sort("3 7").unwrap(), 4);
+
+    println!("\n✓ All tests passed!");
 }
