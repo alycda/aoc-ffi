@@ -5,6 +5,10 @@ edition = "2024"
 
 [dependencies]
 
-
 [dev-dependencies]
+criterion = "0.5"
 rstest = "0.26"
+
+[[bench]]
+name = "aoc_bench"
+harness = false

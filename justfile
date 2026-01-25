@@ -17,3 +17,13 @@ present-with-speaker-notes:
     tmux new-session -d -s present 'presenterm --listen-speaker-notes slides.md' \; \
         split-window -h 'presenterm --publish-speaker-notes slides.md' \; \
         attach -t present
+
+# AOC benchmarks
+aoc-test:
+    cd aoc-2024-12-01 && cargo test
+
+aoc-bench:
+    cd aoc-2024-12-01 && cargo bench
+
+aoc-run:
+    cd aoc-2024-12-01 && cargo run
