@@ -1,11 +1,17 @@
 //! 2024 Day 1: Historian Hysteria
+//!
+//! NOTE: This example is intentionally contrived - Rust's built-in sort is both
+//! safer and faster. The point is to demonstrate FFI mechanics (extern "C",
+//! function pointers, unsafe) with a familiar algorithm before tackling more
+//! complex FFI scenarios.
 
 use std::ffi::c_void;
 use std::os::raw::c_int;
 
 // FFI declaration for libc's qsort
 unsafe extern "C" {
-    // https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm
+    // Reference: https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm
+    // Or see: man 3 qsort on any Unix system
     fn qsort(
         // the pointer to the first element of the array to be sorted
         base: *mut c_void,
@@ -22,11 +28,25 @@ unsafe extern "C" {
 // Must return: negative if a < b, zero if a == b, positive if a > b
 unsafe extern "C" fn compare_i32(a: *const c_void, b: *const c_void) -> c_int {
     // SAFETY: qsort guarantees valid pointers to i32 elements
-    unsafe {
+    let (a, b) = unsafe {
         let a = *(a as *const i32);
         let b = *(b as *const i32);
-        a - b  // Simple subtraction works for i32 comparisons vs `a.cmp(&b) as c_int`
+        (a, b)
+    };
+
+    // IMPORTANT: Don't use `a - b` here! It can overflow:
+    // If a = i32::MAX and b = i32::MIN, subtraction panics (debug) or wraps (release)
+    // The correct C idiom:
+    if a < b {
+        -1
+    } else if a > b {
+        1
+    } else {
+        0
     }
+
+    // Alternative: use Rust's cmp (but shows less C idiom for teaching)
+    // a.cmp(&b) as c_int
 }
 
 // Wrapper that calls C's qsort on a Rust Vec<i32>
@@ -85,13 +105,24 @@ fn process(input: &str) -> Result<i32, String> {
 fn main() {
     println!("2024 Day 1");
 
-    assert_eq!(process("3 7").unwrap(), 4);
-    assert_eq!(process("9 3").unwrap(), 6);
-
     println!("Part 1: {}", process("3   4
 4   3
 2   5
 1   3
 3   9
 3   3").expect("11"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use rstest::*;
+
+    #[rstest]
+    #[case("3 7", 4)]
+    #[case("9 3", 6)]
+    fn part_1(#[case] input: &str, #[case] expected: i32) {
+        assert_eq!(process(input).unwrap(), expected);
+    }
 }
