@@ -8,6 +8,38 @@
 use std::ffi::c_void;
 use std::os::raw::c_int;
 
+// ============================================================================
+// Zero-Cost Abstraction: Sorter Trait with Marker Types
+// ============================================================================
+
+/// Trait for different sorting strategies
+///
+/// This is a zero-cost abstraction because:
+/// - Marker types are zero-sized (no runtime memory)
+/// - Monomorphization creates specialized versions at compile time
+/// - No vtables or dynamic dispatch - all resolved statically
+pub trait Sorter {
+    fn sort(vec: &mut Vec<i32>);
+}
+
+/// Marker type for native Rust sorting
+pub struct NativeSort;
+
+impl Sorter for NativeSort {
+    fn sort(vec: &mut Vec<i32>) {
+        vec.sort();
+    }
+}
+
+/// Marker type for C qsort
+pub struct CSort;
+
+impl Sorter for CSort {
+    fn sort(vec: &mut Vec<i32>) {
+        c_qsort(vec);
+    }
+}
+
 pub const SAMPLE_INPUT: &str = "3   4
 4   3
 2   5
@@ -93,12 +125,20 @@ fn unzip(input: &str) -> (Vec<i32>, Vec<i32>) {
         .unzip()
 }
 
-/// Process using C qsort
-pub fn process_c_qsort(input: &str) -> Result<i32, String> {
+// ============================================================================
+// Generic solve function - Zero-Cost Abstraction
+// ============================================================================
+
+/// Generic process function that works with any Sorter implementation
+///
+/// This function gets monomorphized at compile time for each concrete type S.
+/// The compiler generates specialized versions: solve::<NativeSort>, solve::<CSort>, etc.
+/// This means zero runtime overhead - it's as if you wrote separate functions by hand.
+pub fn solve<S: Sorter>(input: &str) -> Result<i32, String> {
     let (mut left, mut right): (Vec<i32>, Vec<i32>) = unzip(input);
 
-    c_qsort(&mut left);
-    c_qsort(&mut right);
+    S::sort(&mut left);
+    S::sort(&mut right);
 
     Ok(left
         .iter()
@@ -108,19 +148,18 @@ pub fn process_c_qsort(input: &str) -> Result<i32, String> {
     )
 }
 
+// ============================================================================
+// Convenience wrapper functions - Public API
+// ============================================================================
+
+/// Process using C qsort
+pub fn process_c_qsort(input: &str) -> Result<i32, String> {
+    solve::<CSort>(input)
+}
+
 /// Process using Rust's built-in sort
 pub fn process_rust_sort(input: &str) -> Result<i32, String> {
-    let (mut left, mut right): (Vec<i32>, Vec<i32>) = unzip(input);
-
-    left.sort();
-    right.sort();
-
-    Ok(left
-        .iter()
-        .zip(right.iter())
-        .map(|(l, r)| (l-r).abs())
-        .sum::<i32>()
-    )
+    solve::<NativeSort>(input)
 }
 
 #[cfg(test)]
