@@ -19,9 +19,9 @@
                 "clear": false,
                 "group": "workspace-terminals"
             },
-            "runOptions": {
-                "runOn": "folderOpen"
-            },
+            // "runOptions": {
+            //     "runOn": "folderOpen"
+            // },
             "problemMatcher": []
         },
         {
@@ -37,9 +37,9 @@
                 "clear": false,
                 "group": "workspace-terminals"
             },
-            "runOptions": {
-                "runOn": "folderOpen"
-            },
+            // "runOptions": {
+            //     "runOn": "folderOpen"
+            // },
             "problemMatcher": []
         }
     ]

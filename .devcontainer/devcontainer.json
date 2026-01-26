@@ -29,12 +29,13 @@
                 "editor.wordWrap": "on",
                 "git.autofetch": true,
                 "git.confirmSync": false,
+                "git.enabled": false, // prefer jujutsu
                 // "nix.enableLanguageServer": true, Command nil not found in $PATH (because it's installed later by direnv)
                 // "nix.serverPath": "rnix-lsp",
                 "sourceControl.providers": [
                     "jujutsu"   // keep only the Jujutsu provider
                 ],
-                "workbench.secondarySideBar.defaultVisibility": "hidden",
+                "workbench.secondarySideBar.defaultVisibility": "hidden"
             }
         }
     },

@@ -51,7 +51,7 @@
   home.sessionVariables = {
     EDITOR = "hx";
     VISUAL = "code";
-    CHEAT_CONFIG_PATH = "/workspaces/dev/.devcontainer/cheat/conf.yml";
+    CHEAT_CONFIG_PATH = "/workspaces/aoc-ffi/.devcontainer/cheat/conf.yml";
   };
 
   home.stateVersion = "24.05";
