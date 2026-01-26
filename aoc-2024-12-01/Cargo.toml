@@ -3,6 +3,9 @@ name = "aoc-2024-12-01"
 version = "0.1.0"
 edition = "2024"
 
+[build-dependencies]
+cc = "1"
+
 [dependencies]
 glib-sys = { version = "0.20", optional = true }
 

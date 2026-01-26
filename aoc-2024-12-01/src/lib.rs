@@ -233,6 +233,50 @@ pub fn process_part_2_glib(input: &str) -> Result<i32, String> {
     }
 }
 
+// ============================================================================
+// uthash - Header-only C hash table library via cc + extern "C"
+// ============================================================================
+
+// Opaque type representing the uthash hash table (struct hash_entry*)
+#[repr(C)]
+struct HashEntry {
+    _opaque: [u8; 0],
+}
+
+unsafe extern "C" {
+    fn uthash_build_frequency_map(arr: *const i32, len: usize) -> *mut HashEntry;
+    fn uthash_lookup(hash_table: *mut HashEntry, key: i32) -> i32;
+    fn uthash_destroy(hash_table: *mut HashEntry);
+}
+
+/// Part 2 using uthash (C header-only hash table library)
+///
+/// uthash is a popular C hash table implementation using macros.
+/// This demonstrates FFI with a C library compiled via the `cc` crate.
+pub fn process_part_2_uthash(input: &str) -> Result<i32, String> {
+    let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    unsafe {
+        // Build frequency map using uthash
+        let hash_table = uthash_build_frequency_map(
+            right.as_ptr(),
+            right.len()
+        );
+
+        // Calculate result
+        let mut result = 0;
+        for &n in &left {
+            let count = uthash_lookup(hash_table, n);
+            result += n * count;
+        }
+
+        // Clean up
+        uthash_destroy(hash_table);
+
+        Ok(result)
+    }
+}
+
 /// Part 2 using naive filter approach (original - for comparison)
 ///
 /// This is O(n*m) - for each left element, scan entire right list
@@ -290,15 +334,23 @@ mod tests {
     }
 
     #[test]
+    fn test_part_2_uthash() {
+        assert_eq!(process_part_2_uthash(SAMPLE_INPUT).unwrap(), 31);
+    }
+
+    #[test]
     fn test_all_part_2_agree() {
         let naive = process_part_2(SAMPLE_INPUT).unwrap();
         let hashmap = process_part_2_hashmap(SAMPLE_INPUT).unwrap();
         #[cfg(feature = "glib")]
         let glib = process_part_2_glib(SAMPLE_INPUT).unwrap();
 
+        let uthash = process_part_2_uthash(SAMPLE_INPUT).unwrap();
+
         assert_eq!(naive, hashmap);
         #[cfg(feature = "glib")]
         assert_eq!(hashmap, glib);
+        assert_eq!(hashmap, uthash);
         assert_eq!(naive, 31);
     }
 }
