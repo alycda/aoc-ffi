@@ -18,12 +18,19 @@ present-with-speaker-notes:
         split-window -h 'presenterm --publish-speaker-notes slides.md' \; \
         attach -t present
 
-# AOC benchmarks
+[working-directory: 'aoc-2024-12-01']
 aoc-test:
-    cd aoc-2024-12-01 && cargo test
+    cargo test
 
+[working-directory: 'aoc-2024-12-01']
 aoc-bench:
-    cd aoc-2024-12-01 && cargo bench
+    cargo bench
 
+[working-directory: 'aoc-2024-12-01']
 aoc-run:
-    cd aoc-2024-12-01 && cargo run
+    cargo run
+
+# UniFFI bindings - build library
+[working-directory: 'aoc-2024-12-01']
+build-lib:
+    cargo build --release --lib

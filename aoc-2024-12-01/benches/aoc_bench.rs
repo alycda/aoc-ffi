@@ -1,6 +1,6 @@
-use aoc_2024_12_01::{process_c_qsort, process_rust_sort, process_part_2, process_part_2_hashmap, process_part_2_ahash, process_part_2_uthash};
+use aoc_ffi_day01::{process_c_qsort, process_rust_sort, process_part_2, process_part_2_hashmap, process_part_2_ahash, process_part_2_uthash};
 #[cfg(feature = "glib")]
-use aoc_2024_12_01::process_part_2_glib;
+use aoc_ffi_day01::process_part_2_glib;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 const REAL_INPUT: &'static str = include_str!("./REAL_INPUT.txt");

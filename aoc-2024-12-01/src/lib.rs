@@ -381,3 +381,61 @@ mod tests {
         assert_eq!(naive, 31);
     }
 }
+
+// ============================================================================
+// UniFFI bindings - exposes Rust functions to Python, Kotlin, Swift
+// ============================================================================
+
+// Error type for UniFFI - must derive specific traits
+#[derive(Debug, thiserror::Error, uniffi::Error)]
+#[uniffi(flat_error)]
+pub enum AocError {
+    #[error("Parse error: {0}")]
+    ParseError(String),
+    #[error("Allocation error: {0}")]
+    AllocationError(String),
+}
+
+// Convert our String errors to AocError
+impl From<String> for AocError {
+    fn from(s: String) -> Self {
+        AocError::ParseError(s)
+    }
+}
+
+// Wrapper functions for UniFFI - these accept String instead of &str
+// and delegate to the original functions
+
+#[uniffi::export]
+pub fn uniffi_process_rust_sort(input: String) -> Result<i32, AocError> {
+    process_rust_sort(&input).map_err(Into::into)
+}
+
+#[uniffi::export]
+pub fn uniffi_process_c_qsort(input: String) -> Result<i32, AocError> {
+    process_c_qsort(&input).map_err(Into::into)
+}
+
+#[uniffi::export]
+pub fn uniffi_process_part_2(input: String) -> Result<i32, AocError> {
+    process_part_2(&input).map_err(Into::into)
+}
+
+#[uniffi::export]
+pub fn uniffi_process_part_2_hashmap(input: String) -> Result<i32, AocError> {
+    process_part_2_hashmap(&input).map_err(Into::into)
+}
+
+#[cfg(feature = "glib")]
+#[uniffi::export]
+pub fn uniffi_process_part_2_glib(input: String) -> Result<i32, AocError> {
+    process_part_2_glib(&input).map_err(Into::into)
+}
+
+#[uniffi::export]
+pub fn uniffi_process_part_2_uthash(input: String) -> Result<i32, AocError> {
+    process_part_2_uthash(&input).map_err(Into::into)
+}
+
+// Include the generated scaffolding
+uniffi::include_scaffolding!("aoc_ffi_day01");
