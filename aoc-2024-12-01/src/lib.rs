@@ -123,6 +123,15 @@ pub fn process_rust_sort(input: &str) -> Result<i32, String> {
     )
 }
 
+pub fn process_part_2(input: &str) -> Result<i32, String> {
+    let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    Ok(left
+        .iter()
+        .map(|n| n * right.iter().filter(|&x| x==n).count() as i32)
+        .sum())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -144,10 +153,15 @@ mod tests {
     }
 
     #[test]
-    fn test_both_agree() {
+    fn test_part_1_agree() {
         assert_eq!(
             process_c_qsort(SAMPLE_INPUT).unwrap(),
             process_rust_sort(SAMPLE_INPUT).unwrap()
         );
+    }
+
+    #[test]
+    fn test_part_2() {
+        assert_eq!(process_part_2(SAMPLE_INPUT).unwrap(), 31);
     }
 }
