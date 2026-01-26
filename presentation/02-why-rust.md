@@ -27,6 +27,9 @@ Why Rust?
     Immediately I was hooked on the language, ecosystem and community, especially the quality of tutorials available; and Rust made it possible for a TypeScript engineer to transition into Systems Programming at lightspeed (with a LOT of help from Claude along the way to explain concepts and syntax, more on that later).
 
     That transition relied on good learning tools. Which brings us to Advent of Code.
+
+    So let me tell you about how Advent of Code became my playground(s) for Rust
+        (and later FFI and then CRDTs)
  -->
 
 <!-- end_slide -->
