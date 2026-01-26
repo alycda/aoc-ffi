@@ -123,6 +123,36 @@ pub fn process_rust_sort(input: &str) -> Result<i32, String> {
     )
 }
 
+// ============================================================================
+// Part 2: Hash Table Implementations
+// ============================================================================
+
+use std::collections::HashMap;
+
+/// Part 2 using Rust HashMap with fold
+///
+/// This approach:
+/// 1. Builds a frequency map of the right list using fold
+/// 2. For each number in left, multiply it by its count in right
+pub fn process_part_2_hashmap(input: &str) -> Result<i32, String> {
+    let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    // Build frequency map using fold
+    let counts: HashMap<i32, usize> = right.iter()
+        .fold(HashMap::new(), |mut acc, &n| {
+            *acc.entry(n).or_insert(0) += 1;
+            acc
+        });
+
+    Ok(left
+        .iter()
+        .map(|&n| n * *counts.get(&n).unwrap_or(&0) as i32)
+        .sum())
+}
+
+/// Part 2 using naive filter approach (original - for comparison)
+///
+/// This is O(n*m) - for each left element, scan entire right list
 pub fn process_part_2(input: &str) -> Result<i32, String> {
     let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
 
@@ -163,5 +193,6 @@ mod tests {
     #[test]
     fn test_part_2() {
         assert_eq!(process_part_2(SAMPLE_INPUT).unwrap(), 31);
+        assert_eq!(process_part_2_hashmap(SAMPLE_INPUT).unwrap(), 31);
     }
 }

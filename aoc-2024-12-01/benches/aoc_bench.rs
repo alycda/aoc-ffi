@@ -1,4 +1,4 @@
-use aoc_2024_12_01::{SAMPLE_INPUT, process_c_qsort, process_rust_sort};
+use aoc_2024_12_01::{SAMPLE_INPUT, process_c_qsort, process_rust_sort, process_part_2, process_part_2_hashmap};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn benchmark_process_c_qsort(c: &mut Criterion) {
@@ -13,5 +13,17 @@ fn benchmark_process_rust_sort(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, benchmark_process_c_qsort, benchmark_process_rust_sort);
+fn benchmark_process_part_2(c: &mut Criterion) {
+    c.bench_function("part 2 naive", |b| {
+        b.iter(|| process_part_2(black_box(SAMPLE_INPUT)))
+    });
+}
+
+fn benchmark_process_part_2_hashmap(c: &mut Criterion) {
+    c.bench_function("part 2 hashmap", |b| {
+        b.iter(|| process_part_2_hashmap(black_box(SAMPLE_INPUT)))
+    });
+}
+
+criterion_group!(benches, benchmark_process_c_qsort, benchmark_process_rust_sort, benchmark_process_part_2, benchmark_process_part_2_hashmap);
 criterion_main!(benches);
