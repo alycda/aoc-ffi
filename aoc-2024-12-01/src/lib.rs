@@ -150,6 +150,89 @@ pub fn process_part_2_hashmap(input: &str) -> Result<i32, String> {
         .sum())
 }
 
+// Using glib-sys - GLib hash table for frequency counting
+#[cfg(feature = "glib")]
+use glib_sys::{
+    g_hash_table_new, g_hash_table_destroy, g_hash_table_insert,
+    g_hash_table_lookup, g_direct_hash, g_direct_equal, gpointer
+};
+
+/// Build frequency map using GLib's GHashTable
+/// GHashTable is GLib's hash map implementation (similar to HashMap in Rust)
+#[cfg(feature = "glib")]
+unsafe fn glib_build_freq_map(arr: &[i32]) -> *mut glib_sys::GHashTable {
+    unsafe {
+        // Create hash table with direct hash (for integer keys stored as pointers)
+        let table = g_hash_table_new(
+            Some(g_direct_hash),    // hash function for integer keys
+            Some(g_direct_equal)     // equality function for integer keys
+        );
+
+        // Count frequencies
+        for &value in arr {
+            // GLib stores keys/values as void pointers (gpointer)
+            let key = value as gpointer;
+
+            // Look up current count (stored as pointer)
+            let current = g_hash_table_lookup(table, key);
+            let count = if current.is_null() {
+                0
+            } else {
+                current as isize
+            };
+
+            // Store incremented count
+            let new_count = (count + 1) as gpointer;
+            g_hash_table_insert(table, key, new_count);
+        }
+
+        table
+    }
+}
+
+#[cfg(feature = "glib")]
+unsafe fn glib_get_freq(table: *mut glib_sys::GHashTable, value: i32) -> i32 {
+    unsafe {
+        let key = value as gpointer;
+        let result = g_hash_table_lookup(table, key);
+
+        if result.is_null() {
+            0
+        } else {
+            result as i32
+        }
+    }
+}
+
+/// Part 2 using GLib's GHashTable via glib-sys FFI
+///
+/// This demonstrates using GLib's hash table from C.
+/// GHashTable is a widely-used hash table implementation in the C ecosystem.
+///
+/// Enabled with the "glib" feature (default).
+/// To build without glib: cargo build --no-default-features
+#[cfg(feature = "glib")]
+pub fn process_part_2_glib(input: &str) -> Result<i32, String> {
+    let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    unsafe {
+        // Build frequency map using GLib
+        let freq_table = glib_build_freq_map(&right);
+
+        // Calculate result
+        let mut result = 0;
+        for &n in &left {
+            let count = glib_get_freq(freq_table, n);
+            result += n * count;
+        }
+
+        // Clean up GLib hash table
+        g_hash_table_destroy(freq_table);
+
+        Ok(result)
+    }
+}
+
 /// Part 2 using naive filter approach (original - for comparison)
 ///
 /// This is O(n*m) - for each left element, scan entire right list
@@ -193,6 +276,29 @@ mod tests {
     #[test]
     fn test_part_2() {
         assert_eq!(process_part_2(SAMPLE_INPUT).unwrap(), 31);
+    }
+
+    #[test]
+    fn test_part_2_hashmap() {
         assert_eq!(process_part_2_hashmap(SAMPLE_INPUT).unwrap(), 31);
+    }
+
+    #[test]
+    #[cfg(feature = "glib")]
+    fn test_part_2_glib() {
+        assert_eq!(process_part_2_glib(SAMPLE_INPUT).unwrap(), 31);
+    }
+
+    #[test]
+    fn test_all_part_2_agree() {
+        let naive = process_part_2(SAMPLE_INPUT).unwrap();
+        let hashmap = process_part_2_hashmap(SAMPLE_INPUT).unwrap();
+        #[cfg(feature = "glib")]
+        let glib = process_part_2_glib(SAMPLE_INPUT).unwrap();
+
+        assert_eq!(naive, hashmap);
+        #[cfg(feature = "glib")]
+        assert_eq!(hashmap, glib);
+        assert_eq!(naive, 31);
     }
 }
