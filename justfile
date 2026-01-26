@@ -34,3 +34,16 @@ aoc-run:
 [working-directory: 'aoc-2024-12-01']
 build-lib:
     cargo build --release --lib
+
+# UniFFI Python bindings
+uniffi-gen-python: build-lib
+    mkdir -p aoc-2024-12-01/bindings/python
+    uniffi-bindgen generate aoc-2024-12-01/src/aoc_ffi_day01.udl \
+        --lib-file aoc-2024-12-01/target/release/libaoc_ffi_day01.so \
+        --language python \
+        --out-dir aoc-2024-12-01/bindings/python
+    cp aoc-2024-12-01/target/release/libaoc_ffi_day01.so aoc-2024-12-01/bindings/python/
+    @echo "✓ Python bindings generated in aoc-2024-12-01/bindings/python/"
+
+uniffi-test-python: uniffi-gen-python
+    cd aoc-2024-12-01 && PYTHONPATH=bindings/python python3 tests/python/test_python_bindings.py
