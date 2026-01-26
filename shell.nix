@@ -13,11 +13,17 @@ pkgs.mkShell {
     # JDK and Kotlin for UniFFI Kotlin bindings
     jdk17
     kotlin
+    # Swift for UniFFI Swift bindings
+    swift
   ];
 
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
 
   shellHook = ''
+    # Prevent SDK conflicts by unsetting DEVELOPER_DIR_FOR_TARGET
+    unset DEVELOPER_DIR_FOR_TARGET
+    unset NIX_APPLE_SDK_VERSION_FOR_TARGET
+
     # Set up Python virtual environment for UniFFI
     if [ ! -d ".venv" ]; then
       echo "Creating Python virtual environment..."
@@ -79,7 +85,16 @@ pkgs.mkShell {
     echo "  just uniffi-gen-kotlin  # Generate Kotlin bindings"
     echo "  just uniffi-test-kotlin # Test Kotlin bindings"
     echo ""
+    echo "Swift bindings:"
+    echo "  just uniffi-gen-swift   # Generate Swift bindings"
+    if [ "$(uname)" = "Linux" ]; then
+      echo "  just uniffi-test-swift  # Test Swift bindings (skipped on Linux/Nix)"
+    else
+      echo "  just uniffi-test-swift  # Test Swift bindings"
+    fi
+    echo ""
     echo "All bindings:"
     echo "  just uniffi-gen-all     # Generate all bindings"
+    echo "  just uniffi-test        # Test Python + Kotlin (Swift on macOS only)"
   '';
 }

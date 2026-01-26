@@ -29,12 +29,26 @@ just clean-bindings
 just uniffi-test
 ```
 
+### Swift Installation and Testing
+
+- **macOS**: Swift is installed via Nix (included in `shell.nix`)
+  - `just uniffi-test-swift` runs tests natively
+
+- **Linux/devcontainer**: Swift tests are **currently skipped** due to glibc conflicts
+  - Nix provides glibc 2.42, but system Swift requires glibc 2.39
+  - Error: `symbol lookup error: undefined symbol: __tunable_is_initialized`
+  - `just uniffi-test-swift` detects Linux + Nix and skips tests gracefully
+  - Swift bindings can be generated but not tested in devcontainer
+
+**Note**: This is a known limitation. Future work may add Docker-based testing.
+
 ### What's Gitignored
 
 The following are auto-generated and platform-specific (not committed to git):
 - `.venv/` - Python virtual environment (platform-specific)
 - `**/bindings/**/*.{py,dylib,so,dll,jar}` - Generated bindings
 - `**/bindings/kotlin/uniffi/` - Generated Kotlin code
+- `**/bindings/swift/*.{swift,h,modulemap,dylib,so,dll}` - Generated Swift bindings
 
 ### Devcontainer Isolation
 
