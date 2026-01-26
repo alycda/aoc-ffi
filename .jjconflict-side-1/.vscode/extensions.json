@@ -1,6 +1,0 @@
-{
-    "unwantedRecommendations": [
-        // doesn't play well with Jujutsu
-        "eamodio.gitlens"
-    ]
-}
