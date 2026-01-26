@@ -128,6 +128,7 @@ pub fn process_rust_sort(input: &str) -> Result<i32, String> {
 // ============================================================================
 
 use std::collections::HashMap;
+use ahash::AHashMap;
 
 /// Part 2 using Rust HashMap with fold
 ///
@@ -140,6 +141,26 @@ pub fn process_part_2_hashmap(input: &str) -> Result<i32, String> {
     // Build frequency map using fold
     let counts: HashMap<i32, usize> = right.iter()
         .fold(HashMap::new(), |mut acc, &n| {
+            *acc.entry(n).or_insert(0) += 1;
+            acc
+        });
+
+    Ok(left
+        .iter()
+        .map(|&n| n * *counts.get(&n).unwrap_or(&0) as i32)
+        .sum())
+}
+
+/// Part 2 using ahash (fast, non-cryptographic hash)
+///
+/// Same algorithm as HashMap but with ahash's faster hasher.
+/// SipHash (std default) is DoS-resistant but slower; ahash trades
+/// that for speed — ideal when keys aren't attacker-controlled.
+pub fn process_part_2_ahash(input: &str) -> Result<i32, String> {
+    let (left, right): (Vec<i32>, Vec<i32>) = unzip(input);
+
+    let counts: AHashMap<i32, usize> = right.iter()
+        .fold(AHashMap::new(), |mut acc, &n| {
             *acc.entry(n).or_insert(0) += 1;
             acc
         });
@@ -334,6 +355,11 @@ mod tests {
     }
 
     #[test]
+    fn test_part_2_ahash() {
+        assert_eq!(process_part_2_ahash(SAMPLE_INPUT).unwrap(), 31);
+    }
+
+    #[test]
     fn test_part_2_uthash() {
         assert_eq!(process_part_2_uthash(SAMPLE_INPUT).unwrap(), 31);
     }
@@ -342,14 +368,15 @@ mod tests {
     fn test_all_part_2_agree() {
         let naive = process_part_2(SAMPLE_INPUT).unwrap();
         let hashmap = process_part_2_hashmap(SAMPLE_INPUT).unwrap();
+        let ahash = process_part_2_ahash(SAMPLE_INPUT).unwrap();
         #[cfg(feature = "glib")]
         let glib = process_part_2_glib(SAMPLE_INPUT).unwrap();
-
         let uthash = process_part_2_uthash(SAMPLE_INPUT).unwrap();
 
         assert_eq!(naive, hashmap);
+        assert_eq!(hashmap, ahash);
         #[cfg(feature = "glib")]
-        assert_eq!(hashmap, glib);
+        assert_eq!(ahash, glib);
         assert_eq!(hashmap, uthash);
         assert_eq!(naive, 31);
     }
