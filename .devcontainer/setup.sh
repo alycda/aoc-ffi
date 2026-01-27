@@ -34,6 +34,14 @@ else
     echo "✓ Rust already installed: $(rustc --version)"
 fi
 
+# Ensure rustup's cargo takes precedence over Nix in all shells
+if [ -f "$HOME/.cargo/env" ]; then
+    # Add to bashrc so it's loaded before home-manager adds Nix to PATH
+    if ! grep -q "\.cargo/env" "$HOME/.bashrc" 2>/dev/null; then
+        echo 'source "$HOME/.cargo/env"' >> "$HOME/.bashrc"
+    fi
+fi
+
 # Get the directory where this script lives
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="$(dirname "$SCRIPT_DIR")"

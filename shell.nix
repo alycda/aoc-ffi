@@ -3,7 +3,6 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     just cheat asciinema_3 presenterm tmux bacon
-    # cargo rustc 
     gcc gnumake clang llvmPackages.libclang.lib
     # FFI dependencies for glib-sys
     pkg-config glib
@@ -14,12 +13,12 @@ pkgs.mkShell {
     # JDK and Kotlin for UniFFI Kotlin bindings
     jdk17
     kotlin
-    # Swift for UniFFI Swift bindings
-    # Note: Swift is installed via system package manager on Linux (see .devcontainer/setup.sh)
-    # On macOS, install Swift via: brew install swift or use Xcode
   ] ++ lib.optionals stdenv.isDarwin [
-    swift
-    cargo rustc # installed in devcontainer to prevent conflicting glibc for swift
+    # On macOS, use Nix for Rust and Swift
+    cargo rustc swift
+  ] ++ lib.optionals stdenv.isLinux [
+    # On Linux, Rust and Swift are installed via system package manager
+    # (see .devcontainer/setup.sh) to avoid glibc conflicts
   ];
 
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
