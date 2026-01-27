@@ -22,6 +22,18 @@ export LC_ALL=en_US.UTF-8
 export USER=${USER:-root}
 export HOME=${HOME:-/root}
 
+# Install Rust via rustup (avoid Nix glibc conflicts with Swift)
+if ! command -v cargo &> /dev/null; then
+    echo "Installing Rust via rustup..."
+    apt-get update
+    apt-get install -y --no-install-recommends curl build-essential
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+    export PATH="$HOME/.cargo/bin:$PATH"
+    echo "✓ Rust installed via rustup"
+else
+    echo "✓ Rust already installed: $(rustc --version)"
+fi
+
 # Get the directory where this script lives
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="$(dirname "$SCRIPT_DIR")"
@@ -50,6 +62,7 @@ if ! command -v swift &> /dev/null; then
         libcurl4-openssl-dev \
         libedit2 \
         libgcc-12-dev \
+        libncurses6 \
         libpython3-dev \
         libsqlite3-0 \
         libstdc++-12-dev \
