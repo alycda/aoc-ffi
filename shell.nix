@@ -3,7 +3,7 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     just cheat asciinema_3 presenterm tmux bacon
-    cargo # rustc 
+    # cargo rustc 
     gcc gnumake clang llvmPackages.libclang.lib
     # FFI dependencies for glib-sys
     pkg-config glib
@@ -19,7 +19,7 @@ pkgs.mkShell {
     # On macOS, install Swift via: brew install swift or use Xcode
   ] ++ lib.optionals stdenv.isDarwin [
     swift
-    rustc # installed in devcontainer to prevent conflicting glibc for swift
+    cargo rustc # installed in devcontainer to prevent conflicting glibc for swift
   ];
 
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
