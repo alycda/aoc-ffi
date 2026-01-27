@@ -27,6 +27,13 @@ When switching between macOS and Linux (devcontainer), you need to rebuild bindi
   - Supports both x86_64 and aarch64 architectures
   - Installation happens automatically in `.devcontainer/setup.sh`
 
+### Rust Installation
+
+- **macOS**: Rust is installed via Nix (included in `shell.nix`)
+- **Linux/devcontainer**: Rust is installed via rustup during container setup
+  - This avoids glibc conflicts between Nix's glibc and system Swift
+  - Installation happens automatically in `.devcontainer/setup.sh`
+
 ### Quick Fix When Switching Platforms
 
 ```bash

@@ -91,15 +91,8 @@ uniffi-test-kotlin: compile-kotlin
 
 # UniFFI Swift bindings
 build-lib-no-glib:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "Building library without GLib (for Swift compatibility)..."
-    # On Linux with Nix, use special script to build outside Nix environment
-    if [ "$(uname)" = "Linux" ] && [ -n "${IN_NIX_SHELL:-}" ] && [ -f .devcontainer/build-swift-lib.sh ]; then
-        bash .devcontainer/build-swift-lib.sh
-    else
-        cd aoc-2024-12-01 && cargo build --release --lib --no-default-features
-    fi
+    @echo "Building library without GLib (for Swift compatibility)..."
+    cd aoc-2024-12-01 && cargo build --release --lib --no-default-features
 
 uniffi-gen-swift: build-lib-no-glib
     mkdir -p aoc-2024-12-01/bindings/swift
