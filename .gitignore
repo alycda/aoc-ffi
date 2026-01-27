@@ -320,6 +320,12 @@ replay_pid*
 **/bindings/kotlin/*.so
 **/bindings/kotlin/*.dll
 **/bindings/kotlin/*.jar
+**/bindings/swift/*.swift
+**/bindings/swift/*.h
+**/bindings/swift/*.modulemap
+**/bindings/swift/*.dylib
+**/bindings/swift/*.so
+**/bindings/swift/*.dll
 
 # Xcode
 #
