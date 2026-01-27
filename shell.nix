@@ -17,8 +17,10 @@ pkgs.mkShell {
     # On macOS, use Nix for Rust and Swift
     cargo rustc swift
   ] ++ lib.optionals stdenv.isLinux [
-    # On Linux, Rust and Swift are installed via system package manager
-    # (see .devcontainer/setup.sh) to avoid glibc conflicts
+    # On Linux:
+    # - Rust is from Nix (via home-manager)
+    # - Swift tests run in Docker (swift:bookworm) to avoid glibc conflicts
+    cargo rustc
   ];
 
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";

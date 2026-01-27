@@ -19,21 +19,6 @@ When switching between macOS and Linux (devcontainer), you need to rebuild bindi
 - **macOS**: Uses `.dylib` files
 - **Linux**: Uses `.so` files
 
-### Swift Installation
-
-- **macOS**: Swift is installed via Nix (included in `shell.nix` on Darwin only)
-- **Linux/devcontainer**: Swift 6.2.3 is installed from Swift.org tarball during container setup
-  - Nix Swift package fails to build on Linux, so we use official Swift.org binaries instead
-  - Supports both x86_64 and aarch64 architectures
-  - Installation happens automatically in `.devcontainer/setup.sh`
-
-### Rust Installation
-
-- **macOS**: Rust is installed via Nix (included in `shell.nix`)
-- **Linux/devcontainer**: Rust is installed via rustup during container setup
-  - This avoids glibc conflicts between Nix's glibc and system Swift
-  - Installation happens automatically in `.devcontainer/setup.sh`
-
 ### Quick Fix When Switching Platforms
 
 ```bash
@@ -46,16 +31,19 @@ just uniffi-test
 
 ### Swift Installation and Testing
 
-- **macOS**: Swift is installed via Nix (included in `shell.nix`)
+- **macOS**: Swift is installed via Nix (included in `shell.nix` on Darwin only)
   - `just uniffi-test-swift` runs tests natively
 
-- **Linux/devcontainer**: Swift tests are **currently skipped** due to glibc conflicts
-  - Nix provides glibc 2.42, but system Swift requires glibc 2.39
-  - Error: `symbol lookup error: undefined symbol: __tunable_is_initialized`
-  - `just uniffi-test-swift` detects Linux + Nix and skips tests gracefully
-  - Swift bindings can be generated but not tested in devcontainer
+- **Linux/devcontainer**: Swift tests run in Docker to avoid glibc conflicts with Nix
+  - `just uniffi-test-swift` automatically falls back to Docker if Swift isn't installed
+  - `just uniffi-test-swift-docker` explicitly runs tests in `swift:bookworm` container
+  - This avoids conflicts between Nix's glibc and system Swift
 
-**Note**: This is a known limitation. Future work may add Docker-based testing.
+### Rust Installation
+
+- **macOS**: Rust is installed via Nix (included in `shell.nix`)
+- **Linux/devcontainer**: Rust is installed via Nix (from home-manager)
+  - Swift tests use Docker to avoid glibc conflicts
 
 ### What's Gitignored
 

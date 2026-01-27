@@ -106,22 +106,29 @@ uniffi-gen-swift: build-lib-no-glib
 
 uniffi-test-swift: uniffi-gen-swift
     @echo "Testing Swift bindings..."
-    @if ! command -v swiftc &> /dev/null; then \
-        echo "⚠️  Swift compiler not found. Please install Swift."; \
-        exit 1; \
+    @if command -v swiftc &> /dev/null; then \
+        cd aoc-2024-12-01/bindings/swift && \
+        swiftc -o test_swift ../../tests/swift/test_swift_bindings.swift aoc_ffi_day01.swift \
+            -import-objc-header aoc_ffi_day01FFI.h -L . -laoc_ffi_day01 && \
+        LD_LIBRARY_PATH=. ./test_swift && \
+        rm -f test_swift && \
+        echo "" && \
+        echo "✓ Swift tests completed"; \
+    else \
+        echo "⚠️  Swift compiler not found locally, using Docker..."; \
+        just uniffi-test-swift-docker; \
     fi
-    @if [ -n "${IN_NIX_SHELL:-}" ] && [ "$(uname)" = "Linux" ]; then \
-        echo "⚠️  Skipping Swift tests in Nix devcontainer due to glibc conflicts"; \
-        echo "    Swift bindings work on macOS. Linux support requires Docker."; \
-        exit 0; \
-    fi
-    cd aoc-2024-12-01/bindings/swift && \
-    swiftc -o test_swift ../../tests/swift/test_swift_bindings.swift aoc_ffi_day01.swift \
-        -import-objc-header aoc_ffi_day01FFI.h -L . -laoc_ffi_day01 && \
-    LD_LIBRARY_PATH=. ./test_swift && \
-    rm -f test_swift
+
+# Test Swift bindings in Docker (avoids glibc conflicts with Nix)
+uniffi-test-swift-docker: uniffi-gen-swift
+    @echo "Testing Swift bindings in Docker container..."
+    docker run --rm \
+        -v "$(pwd)/aoc-2024-12-01:/workspace" \
+        -w /workspace/bindings/swift \
+        swift:bookworm \
+        bash -c "swiftc -o test_swift ../../tests/swift/test_swift_bindings.swift aoc_ffi_day01.swift -import-objc-header aoc_ffi_day01FFI.h -L . -laoc_ffi_day01 && LD_LIBRARY_PATH=. ./test_swift && rm -f test_swift"
     @echo ""
-    @echo "✓ Swift tests completed"
+    @echo "✓ Swift tests completed in Docker"
 
 # Generate all language bindings
 uniffi-gen-all: uniffi-gen-python uniffi-gen-kotlin uniffi-gen-swift
