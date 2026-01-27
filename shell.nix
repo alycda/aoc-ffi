@@ -14,6 +14,9 @@ pkgs.mkShell {
     jdk17
     kotlin
     # Swift for UniFFI Swift bindings
+    # Note: Swift is installed via system package manager on Linux (see .devcontainer/setup.sh)
+    # On macOS, install Swift via: brew install swift or use Xcode
+  ] ++ lib.optionals stdenv.isDarwin [
     swift
   ];
 
@@ -74,6 +77,11 @@ pkgs.mkShell {
     echo "  - Rust toolchain: $(rustc --version 2>/dev/null || echo 'installing...')"
     echo "  - Python $(python --version 2>&1 | cut -d' ' -f2) with uniffi-bindgen"
     echo "  - Kotlin $(kotlin -version 2>&1 | head -n1)"
+    if command -v swift &> /dev/null; then
+      echo "  - Swift $(swift --version 2>&1 | head -n1 | cut -d' ' -f4)"
+    else
+      echo "  - Swift: not installed (install via system package manager)"
+    fi
 
     echo "UniFFI environment ready"
     echo ""

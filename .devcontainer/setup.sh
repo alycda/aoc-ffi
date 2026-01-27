@@ -36,6 +36,57 @@ nix-shell '<home-manager>' -A install
 # Apply the configuration from this repo
 home-manager switch -b backup -f "${SCRIPT_DIR}/home.nix"
 
+# Install Swift from Swift.org (Nix Swift build fails on Linux)
+SWIFT_VERSION="6.2.3"
+SWIFT_PLATFORM="debian12"
+if ! command -v swift &> /dev/null; then
+    echo "Installing Swift ${SWIFT_VERSION} for Debian 12..."
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        binutils \
+        git \
+        gnupg2 \
+        libc6-dev \
+        libcurl4-openssl-dev \
+        libedit2 \
+        libgcc-12-dev \
+        libpython3-dev \
+        libsqlite3-0 \
+        libstdc++-12-dev \
+        libxml2-dev \
+        libz3-dev \
+        pkg-config \
+        tzdata \
+        unzip \
+        zlib1g-dev \
+        wget
+
+    cd /tmp
+    # Detect architecture and download appropriate Swift package
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "x86_64" ]; then
+        SWIFT_URL="https://download.swift.org/swift-${SWIFT_VERSION}-release/${SWIFT_PLATFORM}/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-${SWIFT_PLATFORM}.tar.gz"
+        SWIFT_DIR="swift-${SWIFT_VERSION}-RELEASE-${SWIFT_PLATFORM}"
+    elif [ "$ARCH" = "aarch64" ]; then
+        SWIFT_URL="https://download.swift.org/swift-${SWIFT_VERSION}-release/${SWIFT_PLATFORM}-aarch64/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-${SWIFT_PLATFORM}-aarch64.tar.gz"
+        SWIFT_DIR="swift-${SWIFT_VERSION}-RELEASE-${SWIFT_PLATFORM}-aarch64"
+    else
+        echo "⚠️  Unsupported architecture: $ARCH"
+        exit 1
+    fi
+
+    echo "Downloading Swift for $ARCH..."
+    wget -q "$SWIFT_URL"
+    tar xzf "${SWIFT_DIR}.tar.gz"
+    mv "$SWIFT_DIR" /usr/share/swift
+    ln -s /usr/share/swift/usr/bin/swift /usr/local/bin/swift
+    ln -s /usr/share/swift/usr/bin/swiftc /usr/local/bin/swiftc
+    rm "${SWIFT_DIR}.tar.gz"
+    echo "✓ Swift ${SWIFT_VERSION} installed"
+else
+    echo "✓ Swift already installed: $(swift --version | head -n1)"
+fi
+
 # Allow direnv for this template repo (if it has .envrc)
 if [ -f "${WORKSPACE_DIR}/.envrc" ]; then
     cd "${WORKSPACE_DIR}"

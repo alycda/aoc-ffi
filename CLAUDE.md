@@ -19,6 +19,14 @@ When switching between macOS and Linux (devcontainer), you need to rebuild bindi
 - **macOS**: Uses `.dylib` files
 - **Linux**: Uses `.so` files
 
+### Swift Installation
+
+- **macOS**: Swift is installed via Nix (included in `shell.nix` on Darwin only)
+- **Linux/devcontainer**: Swift 6.2.3 is installed from Swift.org tarball during container setup
+  - Nix Swift package fails to build on Linux, so we use official Swift.org binaries instead
+  - Supports both x86_64 and aarch64 architectures
+  - Installation happens automatically in `.devcontainer/setup.sh`
+
 ### Quick Fix When Switching Platforms
 
 ```bash
