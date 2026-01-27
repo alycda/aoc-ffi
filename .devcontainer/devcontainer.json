@@ -6,6 +6,10 @@
         "source=aoc-ffi-target,target=${containerWorkspaceFolder}/aoc-2024-12-01/target,type=volume"
     ],
     "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "enableNonRootDocker": "true"
+        },
         "ghcr.io/devcontainers/features/nix:1": {
             "packages": []  // home-manager handles packages
         }

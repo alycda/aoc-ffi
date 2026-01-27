@@ -3,7 +3,7 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     just cheat asciinema_3 presenterm tmux bacon
-    cargo rustc gcc gnumake clang llvmPackages.libclang.lib
+    gcc gnumake clang llvmPackages.libclang.lib
     # FFI dependencies for glib-sys
     pkg-config glib
     # Python for UniFFI bindings
@@ -13,8 +13,14 @@ pkgs.mkShell {
     # JDK and Kotlin for UniFFI Kotlin bindings
     jdk17
     kotlin
-    # Swift for UniFFI Swift bindings
-    swift
+  ] ++ lib.optionals stdenv.isDarwin [
+    # On macOS, use Nix for Rust and Swift
+    cargo rustc swift
+  ] ++ lib.optionals stdenv.isLinux [
+    # On Linux:
+    # - Rust is from Nix (via home-manager)
+    # - Swift tests run in Docker (swift:bookworm) to avoid glibc conflicts
+    cargo rustc
   ];
 
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
@@ -74,6 +80,11 @@ pkgs.mkShell {
     echo "  - Rust toolchain: $(rustc --version 2>/dev/null || echo 'installing...')"
     echo "  - Python $(python --version 2>&1 | cut -d' ' -f2) with uniffi-bindgen"
     echo "  - Kotlin $(kotlin -version 2>&1 | head -n1)"
+    if command -v swift &> /dev/null; then
+      echo "  - Swift $(swift --version 2>&1 | head -n1 | cut -d' ' -f4)"
+    else
+      echo "  - Swift: not installed (install via system package manager)"
+    fi
 
     echo "UniFFI environment ready"
     echo ""

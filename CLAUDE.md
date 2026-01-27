@@ -31,17 +31,41 @@ just uniffi-test
 
 ### Swift Installation and Testing
 
-- **macOS**: Swift is installed via Nix (included in `shell.nix`)
+- **macOS**: Swift is installed via Nix (included in `shell.nix` on Darwin only)
   - `just uniffi-test-swift` runs tests natively
 
-- **Linux/devcontainer**: Swift tests are **currently skipped** due to glibc conflicts
-  - Nix provides glibc 2.42, but system Swift requires glibc 2.39
-  - Error: `symbol lookup error: undefined symbol: __tunable_is_initialized`
-  - `just uniffi-test-swift` detects Linux + Nix and skips tests gracefully
-  - Swift bindings can be generated but not tested in devcontainer
+- **Linux/devcontainer**: Swift tests run in Docker to avoid glibc conflicts with Nix
+  - `just uniffi-test-swift` automatically falls back to Docker if Swift isn't installed
+  - `just uniffi-test-swift-docker` explicitly runs tests in `swift:bookworm` container
+  - This avoids conflicts between Nix's glibc and system Swift
 
-**Note**: This is a known limitation. Future work may add Docker-based testing.
+### Rust Installation
 
+- **macOS**: Rust is installed via Nix (included in `shell.nix`)
+- **Linux/devcontainer**: Rust is installed via Nix (from home-manager)
+  - Swift tests use Docker to avoid glibc conflicts
+
+### glibc Cross-Compilation Challenges
+
+**Important lesson**: When mixing Nix with system tools, you're essentially cross-compiling between different glibc versions.
+
+**The Problem**:
+- Nix provides its own glibc (e.g., 2.42) in `/nix/store`
+- System tools (like Swift from Swift.org) use system glibc (e.g., 2.39)
+- Rust libraries built with Nix's glibc cannot be loaded by system Swift
+- Error: `symbol lookup error: undefined symbol: __tunable_is_initialized, version GLIBC_PRIVATE`
+
+**Solutions Attempted**:
+1. ❌ Install Rust via rustup - home-manager clobbers PATH
+2. ❌ Install Swift via apt - Nix Swift build fails on Linux
+3. ✅ **Docker isolation** - Run Swift tests in `swift:bookworm` container
+
+**Why Docker Works**:
+- Rust library built with Nix's glibc in devcontainer
+- Swift tests run in isolated Docker container with matching system glibc
+- No mixing of glibc versions within a single execution environment
+
+**Key Insight**: When you can't control the glibc version of all tools in your stack, use container isolation to keep incompatible environments separate. This is similar to cross-compilation targets, but for libc versions.
 ### What's Gitignored
 
 The following are auto-generated and platform-specific (not committed to git):

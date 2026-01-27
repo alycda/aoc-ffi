@@ -36,6 +36,9 @@ nix-shell '<home-manager>' -A install
 # Apply the configuration from this repo
 home-manager switch -b backup -f "${SCRIPT_DIR}/home.nix"
 
+# Note: Swift tests run in Docker (swift:bookworm) to avoid glibc conflicts with Nix
+# See `just uniffi-test-swift-docker` command
+
 # Allow direnv for this template repo (if it has .envrc)
 if [ -f "${WORKSPACE_DIR}/.envrc" ]; then
     cd "${WORKSPACE_DIR}"
