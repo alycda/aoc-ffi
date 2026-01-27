@@ -309,6 +309,23 @@ replay_pid*
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
 
+# UniFFI generated bindings (platform-specific)
+# These are auto-generated and should be rebuilt for each platform
+**/bindings/python/*.py
+**/bindings/python/*.dylib
+**/bindings/python/*.so
+**/bindings/python/*.dll
+**/bindings/kotlin/uniffi/
+**/bindings/kotlin/*.dylib
+**/bindings/kotlin/*.so
+**/bindings/kotlin/*.dll
+**/bindings/kotlin/*.jar
+**/bindings/swift/*.swift
+**/bindings/swift/*.h
+**/bindings/swift/*.modulemap
+**/bindings/swift/*.dylib
+**/bindings/swift/*.so
+**/bindings/swift/*.dll
 
 # Xcode
 #

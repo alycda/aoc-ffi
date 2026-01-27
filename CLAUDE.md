@@ -11,3 +11,53 @@ This file provides context and guidance for Claude Code sessions
 ### Work In Progress
 
 - **jj**: Prefer this over git but ask to make sure and remember for the rest of the session
+
+## UniFFI Cross-Platform Development
+
+When switching between macOS and Linux (devcontainer), you need to rebuild bindings because they contain platform-specific libraries:
+
+- **macOS**: Uses `.dylib` files
+- **Linux**: Uses `.so` files
+
+### Quick Fix When Switching Platforms
+
+```bash
+# Clean all generated bindings
+just clean-bindings
+
+# Rebuild and test for current platform
+just uniffi-test
+```
+
+### Swift Installation and Testing
+
+- **macOS**: Swift is installed via Nix (included in `shell.nix`)
+  - `just uniffi-test-swift` runs tests natively
+
+- **Linux/devcontainer**: Swift tests are **currently skipped** due to glibc conflicts
+  - Nix provides glibc 2.42, but system Swift requires glibc 2.39
+  - Error: `symbol lookup error: undefined symbol: __tunable_is_initialized`
+  - `just uniffi-test-swift` detects Linux + Nix and skips tests gracefully
+  - Swift bindings can be generated but not tested in devcontainer
+
+**Note**: This is a known limitation. Future work may add Docker-based testing.
+
+### What's Gitignored
+
+The following are auto-generated and platform-specific (not committed to git):
+- `.venv/` - Python virtual environment (platform-specific)
+- `**/bindings/**/*.{py,dylib,so,dll,jar}` - Generated bindings
+- `**/bindings/kotlin/uniffi/` - Generated Kotlin code
+- `**/bindings/swift/*.{swift,h,modulemap,dylib,so,dll}` - Generated Swift bindings
+
+### Devcontainer Isolation
+
+The devcontainer uses Docker volumes to isolate platform-specific build artifacts:
+- `.venv/` → Docker volume `aoc-ffi-venv` (Linux Python packages)
+- `aoc-2024-12-01/target/` → Docker volume `aoc-ffi-target` (Linux Rust build cache)
+
+This means:
+- macOS `.venv` and `target/` live on your local filesystem
+- Linux `.venv` and `target/` live in Docker volumes
+- No conflicts when switching between environments
+- Faster rebuilds (cached per platform)

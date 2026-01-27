@@ -1,7 +1,9 @@
 {
     "image": "debian:bookworm-slim",
     "mounts": [
-        "source=claude-auth,target=/root/.claude,type=volume"
+        "source=claude-auth,target=/root/.claude,type=volume",
+        "source=aoc-ffi-venv,target=${containerWorkspaceFolder}/.venv,type=volume",
+        "source=aoc-ffi-target,target=${containerWorkspaceFolder}/aoc-2024-12-01/target,type=volume"
     ],
     "features": {
         "ghcr.io/devcontainers/features/nix:1": {

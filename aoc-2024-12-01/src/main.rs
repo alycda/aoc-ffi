@@ -1,6 +1,10 @@
 //! 2024 Day 1: Historian Hysteria - CLI Entry Point
 
-use aoc_2024_12_01::{SAMPLE_INPUT, process_c_qsort, process_rust_sort, process_part_2, process_part_2_hashmap};
+use aoc_ffi_day01::{
+    SAMPLE_INPUT,
+    process_c_qsort, process_rust_sort,
+    process_part_2, process_part_2_hashmap,
+};
 
 fn main() {
     println!("2024 Day 1: Comparing C qsort vs Rust sort\n");
