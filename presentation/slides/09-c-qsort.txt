@@ -3,4 +3,4 @@
 
 ---
 
-Actually, there's a bug in this code, but I'll save it for Q&A later
+Actually, there's a bug in this code, can you find the footgun?

@@ -1,0 +1,7 @@
+yes! ahash to the rescue
+
+but, suprisingly, the FFI tax isn't as high as you might expect. again always bench against your data, early, often and ALWAYS 
+
+---
+
+up next: ~~Zero-Cost Astractions~~ UniFFI

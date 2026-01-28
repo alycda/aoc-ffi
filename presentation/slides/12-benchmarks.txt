@@ -1,0 +1,5 @@
+Here are some early benchmark results. No surprise here, C is definitely slower due to FFI overhead, especially on the sample input.
+
+But we test/bench early and often to suppress assumptions with facts about our data/use cases.
+
+Now, on to part 2 with some more interesting results that warrant this experimentation

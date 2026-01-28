@@ -1,0 +1,7 @@
+GLib is everywhere and has it's own hash table implementation
+
+What changes with a real C library:
+
+- int as void pointers - cast i32 to gpointer (type coercion)
+- manual memory management - no drop semantics here! [destroy fn]
+- system dependencies (pkg-config [nix-shell]) - gated by a feature flag (I'll come back to why this is needed later)

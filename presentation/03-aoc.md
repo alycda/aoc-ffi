@@ -44,7 +44,7 @@ Advent of Code → Rust FFI
 ![image:w:90%](./img/aoc.gif)
 
 <!-- speaker_note: |
-    So December 2024, I joined the company's AoC challenge. Who doesn't want to save Christmas?
+    So that December, I joined the company's AoC challenge. Who doesn't want to save Christmas?
 
     **Took 3rd place.** Behind a Java wizard and a Pythonista. They'd been coding for decades in those languages. I'd been writing Rust for months.
 

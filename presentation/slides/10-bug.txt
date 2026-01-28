@@ -1,0 +1,1 @@
+Rust can't catch the integer overflow because we're in an UNSAFE block and we solemnly swore that we were up to no good!

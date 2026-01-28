@@ -1,0 +1,7 @@
+Now we need a wrapper fn to contain the unsafe block to a single location.
+
+C expects raw pointer, sizes and a compare fn, Rust has fat pointers & type safety
+
+so we make a safe fn 🤞🏼 for a clean API swap
+
+--- but we are making a promise to the compiler (that we know what we are doing) and we MUST keep it

@@ -1,0 +1,10 @@
+Now let's get weird and try calling C macros from Rust
+
+- we need a c wrapper
+- and a build.rs script (with cc or autocxx)
+
+and now let's benchmark all of these against the real puzzle input
+
+---
+
+and here's the rust side

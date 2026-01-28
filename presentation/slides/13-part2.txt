@@ -1,0 +1,5 @@
+Same input, different problem.
+
+here I'm showing a hashmap, but there's a naive solution that wins the benchmarks, again on the sample input.
+
+but let's move on to a more complex C integration: a real C library

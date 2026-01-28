@@ -35,7 +35,7 @@ theme:
 
         this is my first public talk
 
-        after 20 years I've broken plenty of things on the internet and let's just hope that today isn't one of those days
+        after 20 years I've broken many things on the internet and let's just hope that today isn't one of those days
 
         I now have about 20s of public speaking experience so go easy on me
 
