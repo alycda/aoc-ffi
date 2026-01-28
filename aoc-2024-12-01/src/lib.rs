@@ -22,12 +22,21 @@ pub trait Sorter {
     fn sort(vec: &mut Vec<i32>);
 }
 
-/// Marker type for native Rust sorting
-pub struct NativeSort;
+/// Marker type for stable Rust sorting
+pub struct StableSort;
 
-impl Sorter for NativeSort {
+impl Sorter for StableSort {
     fn sort(vec: &mut Vec<i32>) {
-        vec.sort();
+        vec.sort(); // timsort mergesort
+    }
+}
+
+/// Marker type for unstable Rust sorting
+pub struct UnstableSort;
+
+impl Sorter for UnstableSort {
+    fn sort(vec: &mut Vec<i32>) {
+        vec.sort_unstable(); // pdquicksort
     }
 }
 
@@ -157,9 +166,14 @@ pub fn process_c_qsort(input: &str) -> Result<i32, String> {
     solve::<CSort>(input)
 }
 
-/// Process using Rust's built-in sort
+/// Process using Rust's unstable sort (pdqsort)
 pub fn process_rust_sort(input: &str) -> Result<i32, String> {
-    solve::<NativeSort>(input)
+    solve::<UnstableSort>(input)
+}
+
+/// Process using Rust's stable sort (timsort)
+pub fn process_rust_sort_stable(input: &str) -> Result<i32, String> {
+    solve::<StableSort>(input)
 }
 
 #[cfg(test)]
@@ -171,8 +185,15 @@ mod tests {
     #[rstest]
     #[case("3 7", 4)]
     #[case("9 3", 6)]
-    fn part_1_rust(#[case] input: &str, #[case] expected: i32) {
+    fn part_1_rust_unstable(#[case] input: &str, #[case] expected: i32) {
         assert_eq!(process_rust_sort(input).unwrap(), expected);
+    }
+
+    #[rstest]
+    #[case("3 7", 4)]
+    #[case("9 3", 6)]
+    fn part_1_rust_stable(#[case] input: &str, #[case] expected: i32) {
+        assert_eq!(process_rust_sort_stable(input).unwrap(), expected);
     }
 
     #[rstest]
@@ -183,10 +204,11 @@ mod tests {
     }
 
     #[test]
-    fn test_both_agree() {
-        assert_eq!(
-            process_c_qsort(SAMPLE_INPUT).unwrap(),
-            process_rust_sort(SAMPLE_INPUT).unwrap()
-        );
+    fn test_all_agree() {
+        let c = process_c_qsort(SAMPLE_INPUT).unwrap();
+        let unstable = process_rust_sort(SAMPLE_INPUT).unwrap();
+        let stable = process_rust_sort_stable(SAMPLE_INPUT).unwrap();
+        assert_eq!(c, unstable);
+        assert_eq!(c, stable);
     }
 }
