@@ -8,6 +8,8 @@ theme:
             center: github.com/alycda/aoc-ffi
 ---
 
+
+
 <!-- font_size: 7 -->
 
 ![](./presentation/img/corro.png)
@@ -24,27 +26,37 @@ theme:
 <!-- speaker_note: |
     Hello_ Rust LA! 
 
-    my name is Alyssa 
+    My name is Alyssa,
         and tonight I want to share with you part of my journey in Rust:
     
-    Learning in Public 
+    Learning in Public,
         through Advent of Code, 
             Rust FFI Edition
 
-    Quick Disclaimer:
 
+    Quick Disclaimer:
         this is my first public talk
 
-        after 20 years I've broken many things on the internet and let's just hope that today isn't one of those days
+        after 20 years I've broken _many_ things on the internet and let's just hope that today isn't one of those days
 
         I now have about 20s of public speaking experience so go easy on me
 
-    Before we dive in: huge thanks to Sean Urbain, Ross Townsend, and the whole Lawrence Harvey crew for organizing this.
+
+    Before we dive in: huge thanks to Sean, Ross, and the whole Lawrence Harvey crew for organizing this.
+
+
+    So who am I and why am I talking about FFI in Rust?
+
+
+
+    [30s]
  -->
 
 <!-- no_footer -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -67,17 +79,26 @@ Staff Software Engineer at [Ditto](https://ditto.com)
 ![](./presentation/img/Ditto.png)
 
 <!-- speaker_note: |
-    So who am I and why am I talking about FFI in Rust?
-
     I recently joined Ditto as a Staff Software Engineer, 
+
         working on Rust FFI SDKS (for platforms like iOS, Android and a dozen more). FFI is literally my day job.
 
+
+
     Before Ditto, I spent 6 years in Free Ad-Supported Streaming TV (FAST) 
+
         building Web Applications for Connected TVs and game consoles. 
+
         Then I became _that engineer_ who kept pushing to adopt Rust.
+
+
+
+    [15-20s]
  -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -103,12 +124,22 @@ and Motorcycle Road Racer
 <!-- speaker_note: |
     and I race motorcycles for fun!
 
-    I have a need for speed so if I start talking too fast, I'm sorry in advance! But you can also read the transcript of this presentation on Github.
+
+    I have a need for speed so if I start talking too fast, I'm sorry in advance! 
+        
+        But you can also read the transcript of this presentation on Github.
+
 
     Alright, credentials established. Let's talk about why I chose Rust.
+
+
+
+    [10-15s]
  -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -120,21 +151,42 @@ Why Rust?
 ![image:w:65%](./presentation/img/cuddlyferris.png)
 
 <!-- speaker_note: |
-    I'm sure I don't have to convince anyone here about choosing Rust but here's why Rust specifically made my journey possible.
+    I'm sure I don't have to convince anyone here but here's why Rust specifically made my journey possible.
 
-    A few years ago I was a TypeScript engineer working on a Video Player Integration when a Partner company asked us to rewrite our code from JS in the Browser to native C++ for embedded Linux CTVS. I tried learning C++ on my own but I just couldn't make it work, especially not fast enough to meet the partner's desired timeline.
+    A few years ago I was a TypeScript engineer working on a Video Player Integration 
+        when a Partner company asked us to rewrite our code from JS in the Browser 
+        to native C++ for embedded Linux CTVS. 
+        
+    I tried learning C++ on my own but I just couldn't make it work, especially not fast enough to meet the partner's desired timeline.
 
-    My colleague (and friend) on this project suggested Rust. He'd mentioned it before and I recently saw a company hackathon project showing how fast it was compared to TypeScript, Go and other languages, so I decided to try to learn Rust instead of C++.
+    My colleague (and friend) on this project suggested Rust. 
+        He'd mentioned it before and I recently saw a company hackathon project 
+        showing how fast it was compared to TypeScript, Go and other languages, 
+        so I decided to try to learn Rust instead of C++.
 
-    Immediately I was hooked on the language, ecosystem and community, especially the quality of tutorials available; and Rust made it possible for a TypeScript engineer to transition into Systems Programming at lightspeed (with a LOT of help from Claude along the way to explain concepts and syntax, more on that later).
 
-    That transition relied on good learning tools. ~~Which brings us to Advent of Code.~~
+    Immediately I was hooked on the language, ecosystem and community, 
+        especially the quality of tutorials available; 
+        
+        and Rust made it possible for a TypeScript engineer 
+        to transition into Systems Programming at lightspeed 
+
+            (with a LOT of help from Claude along the way to explain concepts and syntax, more on that later).
+
+
+    That transition relied on creative learning tools. ~~Which brings us to Advent of Code.~~
 
     So let me tell you about how Advent of Code became my playground(s) for Rust
         (and later FFI and then CRDTs)
+
+
+
+    [50-60s]
  -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -148,9 +200,27 @@ Advent of Code → Rust FFI
 ![image:w:50%](./presentation/img/gru.jpg)
 
 <!-- speaker_note: |
-    First of all, I hate LeetCode. I hate HackerRank. Word problems make me miserable. I'd never done Advent of Code before.
+    First of all, I hate LeetCode. 
+    
+    I hate HackerRank. 
+    
+    Word problems make me miserable. 
+    
+    I'd never even done Advent of Code before.
 
-    But after months of therapy sessions with the Rust compiler—fighting mutable strings across threads, wrestling with lifetimes—I needed wins. Small victories. And I'm competitive, remember the motorcycle?
+
+    But after months of therapy sessions with the Rust compiler—fighting mutable strings across threads, 
+
+        wrestling with lifetimes—I needed wins. 
+
+        Small victories. 
+
+
+    And I'm competitive, remember the motorcycle?
+
+
+
+    [20s]
  -->
 
 <!-- end_slide -->
@@ -162,9 +232,13 @@ I like winning!
 
 ![](./presentation/img/femmewalla.jpg)
 
+<!-- speaker_note: |
+    [5s] -->
 
 <!-- no_footer -->
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -176,16 +250,36 @@ Advent of Code → Rust FFI
 ![image:w:90%](./presentation/img/aoc.gif)
 
 <!-- speaker_note: |
-    So that December, I joined the company's AoC challenge. Who doesn't want to save Christmas?
+    So that December, I joined the company's AoC challenge. 
 
-    **Took 3rd place.** Behind a Java wizard and a Pythonista. They'd been coding for decades in those languages. I'd been writing Rust for months.
+        Who doesn't want to save Christmas?
 
-    Fast-forward to **November 2025:** I'm onboarding at Ditto, learning their FFI patterns for a dozen platforms. And I think: "I learned Rust through AoC. What if I could systematically reinfornce the ffi I recently learned and deployed the exact same way?"
+
+    I Took 3rd place.
+
+        Behind a Java wizard and a Pythonista. 
+
+        They'd been coding for decades in those languages. 
+        
+        I'd been writing Rust for months.
+
+
+    Fast-forward to November 2025: 
+        I'm onboarding at Ditto, learning their FFI patterns for a dozen platforms. 
+        
+        And I think: "I learned Rust through AoC. What if I could systematically reinforce the ffi I recently learned and deployed the exact same way?"
+
 
     Went back to those 2024 puzzles. Started experimenting on GitHub
+
+
+
+    [30s]
  -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -201,24 +295,6 @@ Advent of Code → Rust FFI
 ## Step-by-step exploration
 of Foreign Function Interfaces in Rust
 
-<!-- speaker_note: |
-    
-    So here's what I did: 
-
-    For each puzzle, I'm going to progressively complicate the solution:
-
-        1. We'll start with pure rust to establish a baseline, idiomatic solution
-        2. basic C integration - Then we'll replace part of the solution with a simple call to C
-        3. more complex c integration with headers
-        4. then we'll benchmark with both sample and full input
-        5. then we'll get silly and call c from rust into higher level languages via UniFFI 
-            (we could write our own bindings with cbindgen but for this demo I didn't for time)
-
-    Bonus: Later I'll show zero-cost abstractions in action - where Rust's safety guarantees compile down to the same assembly as unsafe C. 
-
-    Now Let's start with 2024 Day 1...
--->
-
 <!-- incremental_lists: true -->
 1. Pure Rust solution
 2. C FFI with qsort
@@ -232,18 +308,74 @@ of Foreign Function Interfaces in Rust
 ### Bonus
 * Zero-cost abstractions
 
-<!-- speaker_note: | (show us the code)
 
-    ZCA: https://github.com/alycda/aoc-ffi/pull/2
 
-    -->
+<!-- speaker_note: |
+    
+    So here's what I did: 
+
+
+    For each puzzle, I'm going to progressively complicate the solution:
+
+        [next]
+        1. First we'll start with pure Rust to establish an idiomatic baseline
+
+        [next]
+        2. Then we'll replace part of the code with a simple call to C
+
+        [next]
+        3. Then we'll add complexity by integrating a real C library with headers 
+
+        [next]
+        4. Then we'll benchmark with both sample and full puzzle inputs
+
+        [next]
+        5. Then we'll get silly and call C from Rust into higher level languages (like Python) via UniFFI 
+
+
+    [next]
+    Later I'll show some zero-cost abstractions in action
+
+
+
+    Now Let's start with 2024 Day 1...
+
+
+
+    [30s]
+-->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
 Day 1: Historian Hysteria
 ===
+
+<!-- speaker_note: |
+    Day 1 is just a simple 2-list problem. 
+        [next] We need to parse, 
+            [next] sort 
+                [next] and then find the absolute difference.
+
+    [next: input/output]
+
+    [next: parse fn]
+
+    so here's our baseline established in rust.
+
+
+    but what if we want to use a different sorting algorithm? 
+        well rust has sort and sort_unstable, but
+
+        let's use C's Quicksort because why not!
+
+
+
+    [20-30s]
+ -->
 
 <!-- font_size: 2 -->
 
@@ -289,8 +421,8 @@ fn unzip(input: &str) -> (Vec<i32>, Vec<i32>) {
 fn process(input: &str) -> Result<String, String> {
     let (mut left, mut right) = unzip(input);
 
-    left.sort(); // This is STABLE sort (timsort-based)
-    right.sort_unstable(); // pdqsort - closer comparison
+    left.sort(); 
+    right.sort(); 
 
     let output = left.iter().zip(right.iter())
         .map(|(l, r)| (l - r).abs())
@@ -300,26 +432,32 @@ fn process(input: &str) -> Result<String, String> {
 }
 ```
 
-<!-- speaker_note: |
-    Day 1: a simple 2-list problem. We just need to parse, sort and then find the absolute difference.
-
-    so here's our baseline established in rust. Note that Rust has 2 sorting algorithms. On the slide I'm showing you both but I only ran the code against stable sort.
-
-    but what if we want to use a different sorting algorithm? let's use C's Quicksort because why not!
-
-    ---
-
-    https://adventofcode.com/2024/day/1
-
-    Note: `.sort()` is stable (timsort-based). `.sort_unstable()` uses pdqsort - guaranteed O(n log n) worst case unlike C's qsort which can degrade to O(n²). But that's not the point - I'm using qsort to show FFI callback complexity.
- -->
-
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
 Enter C FFI
 ===
+
+<!-- speaker_note: |
+    so we need to declare the fn signature in an extern "C" block
+
+    [next]
+
+    and we need to tell C how to compare items, otherwise it doesn't know what to do with the bytes it's given. strcmp? integers, floats?
+
+    and Actually, there's a bug in this code, can you find it?
+
+
+
+    [15s]
+
+    ---
+
+    yes I know that we can just import from libc but I wanted to show manual implementation without a (large?) dependency
+ -->
 
 <!-- font_size: 2 -->
 
@@ -366,19 +504,9 @@ unsafe extern "C" fn compare_i32(
 }
 ```
 
-<!-- speaker_note: |
-    so we need to declare the fn signature in an extern "C" block
-
-    and we need to tell C how to compare items, otherwise it doesn't know what to do with the bytes it's given. strcmp? integers, floats?
-
-    and Actually, there's a bug in this code, can you find it?
-
-    ---
-
-    yes I know that we can just import from libc but I wanted to show manual implementation without a (large?) dependency
- -->
-
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -404,13 +532,15 @@ unsafe extern "C" fn compare_i32(
 }
 ```
 
+<!-- pause -->
+
 **Hint:** Think about extreme values...
 
 <!-- pause -->
 
 <!-- new_line -->
 
-**The Problem:** Integer overflow!
+#### The Problem: Integer overflow!
 * If `a = i32::MAX` and `b = i32::MIN`
 * Subtraction panics (debug mode) or wraps (release mode)
 * Results in incorrect comparison behavior
@@ -427,9 +557,24 @@ if a < b { -1 } else if a > b { 1 } else { 0 }
 a.cmp(&b) as c_int // but this defeats the purpose of manual FFI implementation for this demo
 ```
 
-<!-- speaker_note: the Rust compiler can't catch the integer overflow ehre because we are in an UNSAFE block and we solemnly swore that we are up to no good! -->
+<!-- speaker_note: |
+    that's right, integer overflow
+
+
+    the Rust compiler can't help us here because we are in an UNSAFE block 
+        and we solemnly swore that we are up to no good! 
+
+    so we need to either write out this if/else statement 
+        or just use the Compare method (and cast) but again the compiler won't tell us about it.
+
+
+    [15s]
+    
+    -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -479,23 +624,46 @@ fn c_qsort(vec: &mut Vec<i32>) {
 * Unsafe block required
 
 <!-- speaker_note: |
-
     Now we need a wrapper fn to contain the unsafe block to a single location.
 
-    C expects raw pointer, sizes and a compare fn, Rust has fat pointers & type safety
+    C expects a raw pointer, sizes and a compare fn, 
+        Rust has fat pointers & type safety
 
     so we make a safe fn 🤞🏼 for a clean API swap
 
     --- but we are making a promise to the compiler (that we know what we are doing) and we MUST keep it
 
+
+    [20-30s]
+
     -->
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
 Benchmarks
 ===
+
+<!-- speaker_note: |
+
+    Here are some early benchmark results.
+        No surprise here, C is definitely slower due to FFI overhead, 
+        especially on the sample input.
+
+    [next]
+
+    But we test/bench early and often to suppress assumptions with facts about our actual data & use cases.
+
+
+    Now, on to part 2 with some more interesting results that warrant this experimentation
+
+
+    [20-30s]
+
+    -->
 
 <!-- font_size: 2 -->
 
@@ -549,22 +717,31 @@ Found 4 outliers among 100 measurements (4.00%)
 * Rust's `.sort()` monomorphizes the comparator
 * FFI call overhead adds up per comparison
 
-<!-- speaker_note: |
-
-    Here are some early benchmark results. No surprise here, C is definitely slower due to FFI overhead, especially on the sample input.
-
-    But we test/bench early and often to suppress assumptions with facts about our data/use cases.
-
-    Now, on to part 2 with some more interesting results that warrant this experimentation
-
-    -->
-
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
 Part 2: Similarity Score
 ===
+
+<!-- speaker_note: |
+
+    Same input, but different problem.
+
+    [next]
+
+    here I'm showing a hashmap, but there's a naive solution that wins the benchmarks, 
+        again on the sample input.
+
+
+    but let's move on to a more complex integration with a real C library
+
+
+    [15-20s]
+
+    -->
 
 <!-- font_size: 2 -->
 
@@ -620,20 +797,27 @@ pub fn process_part_2_hashmap(input: &str) -> Result<i32, String> {
 
 <!-- end_slide -->
 
-<!-- speaker_note: |
 
-    Same input, different problem.
-
-    here I'm showing a hashmap, but there's a naive solution that wins the benchmarks, again on the sample input.
-
-    but let's move on to a more complex C integration: a real C library
-
-    -->
 
 <!-- font_size: 7 -->
 
 GLib Hash Table FFI
 ===
+
+<!-- speaker_note: |
+
+    GLib is everywhere and has it's own hash table implementation
+
+    What changes with a real C library:
+
+    - int as void pointers - cast i32 to gpointer (type coercion)
+    - manual memory management - no drop semantics here! [destroy fn]
+    - system dependencies (pkg-config [nix-shell]) - gated by a feature flag (I'll come back to why this is needed later)
+
+
+    [30-45s]
+
+ -->
 
 <!-- font_size: 2 -->
 
@@ -685,24 +869,26 @@ fn process_part_2_glib(input: &str) -> Result<i32, String> {
 * Entire function body is `unsafe`
 * Optional feature flag for system dependencies
 
-<!-- speaker_note: |
-
-    GLib is everywhere and has it's own hash table implementation
-
-    What changes with a real C library:
-
-    - int as void pointers - cast i32 to gpointer (type coercion)
-    - manual memory management - no drop semantics here! [destroy fn]
-    - system dependencies (pkg-config [nix-shell]) - gated by a feature flag (I'll come back to why this is needed later)
-
- -->
-
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
 uthash: Macro-Based C Hash Table
 ===
+
+<!-- speaker_note: |
+
+    and one more C integration, a macro-only C library.
+
+    we have to write our own C wrapper for this, 
+        but I promise it almost seems worth it after the benchmarks which we'll see next
+
+
+    [15-30s]
+
+ -->
 
 <!-- new_line -->
 
@@ -746,7 +932,10 @@ struct hash_entry* uthash_build_frequency_map(const int32_t* arr, size_t len) {
     return table;
 }
 ```
+
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -793,12 +982,41 @@ fn process_part_2_uthash(input: &str) -> Result<i32, String> {
 * Requires C wrapper functions
 * Compiled via `cc` crate in build.rs
 
+<!-- speaker_note: |
+
+    and here's the rust code.
+
+    now, on to the benchmarks!
+
+
+    [??s]
+
+ -->
+
 <!-- end_slide -->
 
 <!-- font_size: 7 -->
 
 Benchmarks: At Scale
 ===
+
+<!-- speaker_note: |
+
+    now with the real puzzle input:
+
+    part 1: no surprise here, rust is faster
+
+    [next]
+
+    part 2: at scale hashmap beats the naive implementation (as it should)
+
+    but oops, our toy example is so contrived that FFI beats Rust. 
+        Can we fix this? 
+
+
+    [??s]
+
+ -->
 
 <!-- new_line -->
 
@@ -825,70 +1043,6 @@ Rust still ~73% faster at scale.
 #### Part 2: Frequency Counting
 
 ```
-part 2 hashmap          time:   [59.067 µs  59.269 µs  59.478 µs]
-
-part 2 naive            time:   [77.219 µs  77.426 µs  77.664 µs]
-```
-
-**At scale, O(n) HashMap wins** — 30% faster than naive O(n*m)
-
-<!-- pause -->
-
-<!-- new_lines: 2 -->
-
-#### Swapping the hash function: ahash
-
-```
-part 2 ahash            time:   [44.199 µs  44.347 µs  44.500 µs]
-
-part 2 hashmap (SipHash) time:  [56.771 µs  56.998 µs  57.234 µs]
-```
-
-**ahash is ~29% faster** — same API, zero `unsafe`, drop-in replacement
-
-<!-- new_line -->
-
-* The real bottleneck was the hash function, not the language
-* **Always benchmark YOUR data**
-
-<!-- end_slide -->
-
-<!-- font_size: 7 -->
-
-<!-- skip_slide -->
-
-Benchmarks: Real Input
-===
-
-<!-- new_line -->
-
-<!-- font_size: 2 -->
-
-### 1000 lines (criterion)
-
-<!-- new_line -->
-
-#### Part 1: Sorting
-
-<!-- new_line -->
-
-```
-process rust sort       time:   [39.414 µs  39.554 µs  39.701 µs]
-
-process c qsort         time:   [68.126 µs  68.518 µs  68.917 µs]
-```
-
-Rust still ~73% faster at scale.
-
-<!-- pause -->
-
-<!-- new_lines: 2 -->
-
-#### Part 2: Frequency Counting
-
-<!-- new_line -->
-
-```
 part 2 uthash           time:   [50.500 µs  50.670 µs  50.852 µs]
 
 part 2 glib             time:   [50.988 µs  51.239 µs  51.527 µs]
@@ -898,24 +1052,41 @@ part 2 hashmap          time:   [59.067 µs  59.269 µs  59.478 µs]
 part 2 naive            time:   [77.219 µs  77.426 µs  77.664 µs]
 ```
 
+**At scale, O(n) HashMap wins** — 30% faster than naive O(n*m)
+
 <!-- pause -->
 
-<!-- new_lines: 2 -->
-
-**At scale, FFI hash tables win!** O(n) vs O(n*m) matters with 1000 elements.
-
-<!-- new_line -->
-
-* uthash and glib are neck-and-neck (~51 µs)
-* Rust's HashMap is ~17% slower than the C implementations
-* Naive is now the slowest — 52% slower than uthash
 
 <!-- end_slide -->
 
 <!-- font_size: 7 -->
 
+
+
+<!-- font_size: 7 -->
+
 ahash to the Rescue
 ===
+
+<!-- speaker_note: |
+
+    of course we can, just change the implementation in Rust! (third-party crate)
+
+    [next]
+
+    now Rust wins, but again with this data (the real puzzle input) the FFI isn't as slow as you might expect.
+
+
+    but remember, this is solely for the purpose of exploring FFI, 
+        this is not production advice for using C hashmaps in Rust 
+
+        (just because these benchmarks aren't that much slower in this highly-contrived use case.)
+
+    now, let's get silly and try calling C from Rust into Python!
+
+    [??s]
+
+ -->
 
 <!-- new_line -->
 
@@ -1064,6 +1235,8 @@ pub fn uniffi_process_rust_sort(input: String) -> Result<i32, AocError> {
 
 <!-- end_slide -->
 
+
+
 <!-- font_size: 7 -->
 
 Python Bindings via UniFFI
@@ -1121,6 +1294,8 @@ uthash  = aoc_ffi_day01.uniffi_process_part_2_uthash(sample)  # 31
 ```
 
 <!-- end_slide -->
+
+
 
 <!-- font_size: 7 -->
 
@@ -1467,7 +1642,13 @@ What's Next?
 
 <!-- incremental_lists: false -->
 
-<!-- speaker_note: The glibc lessons from this project directly informed the devcontainer approach. And I'm excited to apply these FFI learnings to Ditto's CRDT work - exploring safer_ffi as an alternative to UniFFI for production use cases. -->
+<!-- speaker_note: |
+
+    The glibc lessons from this project directly informed the devcontainer approach. And I'm excited to apply these FFI learnings to Ditto's CRDT work - exploring safer_ffi as an alternative to UniFFI for production use cases. 
+
+
+    [??s]
+    -->
 
 <!-- end_slide -->
 
@@ -1671,6 +1852,9 @@ Staff Software Engineer @ [Ditto](https://ditto.com)
     Thanks again for having me. If I didn't get to your question, or if you think of something later, please reach out. I'm always happy to talk about Rust, FFI, or why I race motorcycles and other extreme sports.
 
     Enjoy the rest of the meetup!
+
+
+    [??s]
  -->
 
 <!-- end_slide -->
@@ -1717,6 +1901,9 @@ Errata
 A quick note on tools: I even contributed a PR to Presenterm while preparing this talk - I added a feature, and now you're witnessing the result. That's learning in public in action.
 
 All the code, benchmarks, and these slides are on GitHub. Feel free to clone, experiment, and break things yourself - that's how we learn.
+
+
+    [??s]
 -->
 
 <!-- no_footer -->
