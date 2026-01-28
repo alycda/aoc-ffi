@@ -1,0 +1,7 @@
+So December 2024, I joined the company's AoC challenge. Who doesn't want to save Christmas?
+
+**Took 3rd place.** Behind a Java wizard and a Pythonista. They'd been coding for decades in those languages. I'd been writing Rust for months.
+
+fast-forward to **November 2025:** I'm onboarding at Ditto, learning their FFI patterns for a dozen platforms. And I think: "I learned Rust through AoC. What if I could systematically reinfornce the ffi I recently learned and deployed the exact same way?"
+
+Went back to those 2024 puzzles. Started experimenting publicly on GitHub.

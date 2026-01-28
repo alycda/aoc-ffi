@@ -1,0 +1,16 @@
+Day 1 is usually a simple 2-list problem. today we just need to parse, sort and find the absolute difference
+
+and here's what that looks like in rust, pretty basic
+
+This is our baseline. Pure Rust. Idiomatic. Safe.
+
+    sidebar: rust has 2 sorts: stable and unstable. I ran the stable sort in the benchmarks but on the slide I wanted to acknowledge there are ways of changing the sort method without resorting to C/FFI but whatever sort rust uses isn't particularly interesting to this problem, the FFI integration is.
+
+
+but what if we want to use a different sorting algorithm? let's use C's Quicksort because why not!
+
+    Note: `.sort()` is stable (timsort-based). `.sort_unstable()` uses pdqsort - guaranteed O(n log n) worst case unlike C's qsort which can degrade to O(n²). But that's not the point - I'm using qsort to show FFI callback complexity.
+
+---
+
+https://adventofcode.com/2024/day/1

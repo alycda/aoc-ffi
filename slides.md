@@ -180,7 +180,7 @@ Advent of Code → Rust FFI
 
     **Took 3rd place.** Behind a Java wizard and a Pythonista. They'd been coding for decades in those languages. I'd been writing Rust for months.
 
-    **November 2025:** I'm onboarding at Ditto, learning their FFI patterns for a dozen platforms. And I think: "I learned Rust through AoC. What if I could systematically reinfornce the ffi I recently learned and deployed the exact same way?"
+    Fast-forward to **November 2025:** I'm onboarding at Ditto, learning their FFI patterns for a dozen platforms. And I think: "I learned Rust through AoC. What if I could systematically reinfornce the ffi I recently learned and deployed the exact same way?"
 
     Went back to those 2024 puzzles. Started experimenting publicly on GitHub.
  -->
@@ -199,12 +199,21 @@ Advent of Code → Rust FFI
 <!-- new_line -->
 
 ## Step-by-step exploration
+of Foreign Function Interfaces in Rust
 
-<!-- speaker_note: A step-by-step exploration of Foreign Function Interfaces in Rust -->
+<!-- speaker_note: |
+    
+    So here's the plan: 
 
-<!-- pause -->
+    For each puzzle, I'm going to progressively complicate the solution:
 
-<!-- new_line -->
+        1. We'll start with pure rust to establish a baseline, idiomatic solution
+        2. basic C integration - Then we'll replace part of the solution with a simple call to C
+        3. more complex c integration with headers
+        4. then we'll benchmark with both sample and full input
+        5. then we'll get silly and call c from rust into higher level languages via UniFFI 
+            (we could write our own bindings with cbindgen but for this demo I didn't for time)
+-->
 
 <!-- incremental_lists: true -->
 1. Pure Rust solution
@@ -220,10 +229,7 @@ Advent of Code → Rust FFI
 ### Bonus
 * Zero-cost abstractions
 
-<!-- speaker_note | (show us the code)
-
-    so here's THE PLAN 
-     
+<!-- speaker_note: | (show us the code)
 
     ZCA: https://github.com/alycda/aoc-ffi/pull/2
 
@@ -280,8 +286,8 @@ fn unzip(input: &str) -> (Vec<i32>, Vec<i32>) {
 fn process(input: &str) -> Result<String, String> {
     let (mut left, mut right) = unzip(input);
 
-    left.sort();
-    right.sort();
+    left.sort(); // This is STABLE sort (timsort-based)
+    right.sort_unstable(); // pdqsort - closer comparison
 
     let output = left.iter().zip(right.iter())
         .map(|(l, r)| (l - r).abs())
@@ -293,8 +299,19 @@ fn process(input: &str) -> Result<String, String> {
 
 <!-- speaker_note: |
 
+    Day 1 is usually a simple 2-list problem. today we just need to parse, sort and find the absolute difference
+
+    and here's what that looks like in rust, pretty basic
+
+    This is our baseline. Pure Rust. Idiomatic. Safe.
+
+    but what if we want to use a different sorting algorithm? let's use C's Quicksort because why not!
+
+    -----
 
     https://adventofcode.com/2024/day/1
+
+    Note: `.sort()` is stable (timsort-based). `.sort_unstable()` uses pdqsort - guaranteed O(n log n) worst case unlike C's qsort which can degrade to O(n²). But that's not the point - I'm using qsort to show FFI callback complexity.
  -->
 
 <!-- end_slide -->
@@ -344,7 +361,7 @@ unsafe extern "C" fn compare_i32(
     unsafe {
         let a = *(a as *const i32);
         let b = *(b as *const i32);
-        a.cmp(&b) as c_int
+        a - b
     }
 }
 ```
@@ -360,8 +377,6 @@ unsafe extern "C" fn compare_i32(
 <!-- end_slide -->
 
 <!-- font_size: 7 -->
-
-<!-- skip_slide -->
 
 BUG!
 ===
@@ -468,6 +483,8 @@ Benchmarks
 
 ### Sample Input (criterion)
 
+<!-- new_line -->
+
 ```
 process c qsort         time:   [238.81 ns 239.68 ns 240.62 ns]
 
@@ -476,7 +493,12 @@ process rust sort       time:   [178.21 ns 178.88 ns 179.67 ns]
 
 <!-- pause -->
 
+<!-- new_line -->
+
 #### re-run
+
+<!-- new_line -->
+
 ```
      Running benches/aoc_bench.rs (target/release/deps/aoc_bench-e5fedc316ff25a5f)
 Gnuplot not found, using plotters backend
@@ -499,7 +521,7 @@ Found 4 outliers among 100 measurements (4.00%)
 
 <!-- pause -->
 
-<!-- new_line -->
+<!-- new_lines: 2 -->
 
 **Rust's sort is ~25% faster** on this sample input
 
@@ -1090,8 +1112,6 @@ except aoc_ffi_day01.AocError as e:
 
 <!-- font_size: 7 -->
 
-<!-- skip_slide -->
-
 Kotlin Bindings via UniFFI
 ===
 
@@ -1139,8 +1159,6 @@ val hashmap  = uniffiProcessPart2Hashmap(sample) // 31
 
 <!-- font_size: 7 -->
 
-<!-- skip_slide -->
-
 Kotlin Bindings via UniFFI
 ===
 
@@ -1169,8 +1187,6 @@ mechanisms, same generated shared library.
 <!-- end_slide -->
 
 <!-- font_size: 7 -->
-
-<!-- skip_slide -->
 
 Swift Bindings via UniFFI
 ===
@@ -1851,9 +1867,9 @@ Staff Software Engineer @ [Ditto](https://ditto.com)
 
 
 ### Resources:
-- [AdventOfCode](https://adventofcode.com)
-- Learn X in Y Minutes PRs: https://github.com/adambard/learnxinyminutes-docs/pulls/alycda
-- This presentation: https://github.com/alycda/aoc-ffi/blob/main/slides.md
+- 🎄 [AdventOfCode](https://adventofcode.com)
+- 📝 Learn X in Y Minutes PRs: https://github.com/adambard/learnxinyminutes-docs/pulls/alycda
+- 🎞️ This presentation: https://github.com/alycda/aoc-ffi/blob/main/slides.md
 
 
 <!-- speaker_note: |
@@ -1887,13 +1903,13 @@ Errata
 ## Tools Used
 
 <!-- incremental_lists: false -->
-- [**Presenterm**](https://mfontanini.github.io/presenterm/) — terminal-based slideshow ([contributed PR #826](https://github.com/mfontanini/presenterm/pull/826))
-- [**Ferris**](https://rustacean.net/) — unofficial Rust mascot
-- [**Nix**](https://NixOS.org) — reproducible dev environments
-- [**Jujutsu**](https://www.jj-vcs.dev/) — next-gen VCS (Git-compatible)
-- [**Bacon**](https://dystroy.org/bacon/) — background Rust code checker
-- [**Workflowy**](https://workflowy.com) — outlining and organizing thoughts
-- [**Claude Code**](https://claude.ai/claude-code) — AI pair programming
+- 🎁 [**Presenterm**](https://mfontanini.github.io/presenterm/) — terminal-based slideshow ([contributed PR #826](https://github.com/mfontanini/presenterm/pull/826))
+- 🦀 [**Ferris**](https://rustacean.net/) — unofficial Rust mascot
+- ❄️ [**Nix**](https://NixOS.org) — reproducible dev environments
+- ⚔️ [**Jujutsu**](https://www.jj-vcs.dev/) — next-gen VCS (Git-compatible)
+- 🐽 [**Bacon**](https://dystroy.org/bacon/) — background Rust code checker
+- ☑️ [**Workflowy**](https://workflowy.com) — outlining and organizing thoughts
+- 🤖 [**Claude Code**](https://claude.ai/claude-code) — AI pair programming
 <!-- incremental_lists: false -->
 
 <!-- new_line -->
@@ -1909,3 +1925,65 @@ All the code, benchmarks, and these slides are on GitHub. Feel free to clone, ex
 -->
 
 <!-- no_footer -->
+
+<!-- end_slide -->
+
+<!-- font_size: 7 -->
+
+Zero-Cost Abstractions
+===
+
+<!-- font_size: 2 -->
+
+<!-- new_line -->
+
+### Generic Solve
+
+<!-- new_line -->
+
+```rust
+pub fn solve<S: Sorter>(input: &str) -> Result<i32, String> {
+    let (mut left, mut right) = unzip(input);
+    S::sort(&mut left);
+    S::sort(&mut right);
+    Ok(left.iter().zip(right.iter())
+        .map(|(l, r)| (l-r).abs()).sum::<i32>())
+}
+```
+
+<!-- pause -->
+
+<!-- new_lines: 2 -->
+
+### Convenience Wrappers
+
+<!-- new_line -->
+
+```rust
+pub fn process_c_qsort(input: &str) -> Result<i32, String> {
+    solve::<CSort>(input)
+}
+
+pub fn process_rust_sort(input: &str) -> Result<i32, String> {
+    solve::<UnstableSort>(input)
+}
+
+pub fn process_rust_sort_stable(input: &str) -> Result<i32, String> {
+    solve::<StableSort>(input)
+}
+```
+
+<!-- pause -->
+
+<!-- new_lines: 2 -->
+
+### Why is this zero-cost?
+
+<!-- new_line -->
+
+<!-- incremental_lists: true -->
+* `StableSort`, `UnstableSort`, and `CSort` are **Zero-Sized Types** (no runtime memory)
+* Compiler **monomorphizes** `solve<S>` into **three** specialized functions
+* No vtables, no dynamic dispatch — all resolved **at compile time**
+* Same as C++ templates, but with trait bounds instead of SFINAE
+<!-- incremental_lists: false -->

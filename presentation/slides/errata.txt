@@ -1,0 +1,3 @@
+A quick note on tools: I even contributed a PR to Presenterm while preparing this talk - I added a feature, and now you're witnessing the result. That's learning in public in action.
+
+All the code, benchmarks, and these slides are on GitHub. Feel free to clone, experiment, and break things yourself - that's how we learn.

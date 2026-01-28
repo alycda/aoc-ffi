@@ -1,0 +1,5 @@
+and I race motorcycles for fun!
+
+I have a need for speed so if I talk too fast I'm sorry! But you can also read the transcript of this presentation on Github.
+
+Alright, credentials established. Let's talk about why I chose Rust.

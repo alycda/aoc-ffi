@@ -1,0 +1,28 @@
+So here's the plan
+
+For each puzzle, I'm going to progressively complicate the solution:
+  
+  1. We'll start with pure rust to establish a baseline, idiomatic solution
+  
+  2. Then we'll replace part of the solution with a simple call to C
+    calling into libc, because sometimes the standard library has battle-tested implementations
+      "C FFI with qsort"
+  
+  3. Then we'll add a more complex integration with C headers
+    what if we need a higher-level C library?
+      "GLib integration"
+  
+  4. then we'll benchmark with both sample and full input
+    measuring the actual cost of crossing FFI boundaries
+      "Criterion benchmarks"
+  
+  5. then we'll get silly and call c from rust into higher level languages via UniFFI 
+    > we could write our own bindings with cbindgen but for this demo I didn't for time
+
+    exposing our Rust code to Python, Kotlin, and Swift
+      "UniFFI bindings"
+
+
+Bonus: We'll see zero-cost abstractions in action - where Rust's safety guarantees compile down to the same assembly as unsafe C. 
+
+Now Let's start with 2024 Day 1...

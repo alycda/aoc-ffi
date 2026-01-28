@@ -1,0 +1,8 @@
+So who am I and why am I talking about FFI in Rust?
+
+I recently joined Ditto as a Staff Software Engineer, 
+    working on Rust FFI SDKS (for platforms like iOS, Android and a dozen more). FFI is literally my day job.
+
+Before Ditto, I spent 6 years in Free Ad-Supported Streaming TV (FAST) 
+    building Web Applications for Connected TVs and game consoles. 
+    Then I became _that engineer_ who kept pushing to adopt Rust.

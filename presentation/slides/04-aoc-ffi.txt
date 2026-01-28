@@ -1,0 +1,3 @@
+First of all, I hate LeetCode. I hate HackerRank. Word problems make me miserable. I'd never done Advent of Code before.
+
+But after months of therapy sessions with the Rust compiler—fighting mutable strings across threads, wrestling with lifetimes—I needed wins. Small victories. And I'm competitive, remember the motorcycle?
