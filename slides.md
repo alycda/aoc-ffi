@@ -741,6 +741,14 @@ Part 2: Similarity Score
 
     [15-20s]
 
+    ---
+
+    Same input, different problem. Now we're counting occurrences and calculating a weighted sum.
+
+    there's a shorter naive solution that I have benchmarked but let's move onto different hashmap implementations from C
+
+    "What if we need a real C library?"
+
     -->
 
 <!-- font_size: 2 -->
@@ -885,8 +893,32 @@ uthash: Macro-Based C Hash Table
     we have to write our own C wrapper for this, 
         but I promise it almost seems worth it after the benchmarks which we'll see next
 
+    - and we need a build script (with cc or autocxx)
+
 
     [15-30s]
+
+    ---
+
+    now let's get weird and try calling C macros from rust
+
+    "Now let's get weird - uthash"
+
+    uthash is a popular C library that's entirely macros. No functions to call. Just header files with macro magic.
+
+    You can't call macros from Rust FFI. So we write a C wrapper.
+    
+    (Point to C code)
+
+    Standard C hash table pattern - find or insert, increment the count. But notice those macros: HASH_FIND_INT, HASH_ADD_INT.
+
+    Those expand at compile time into inline code. That's why we need the wrapper - we need actual compiled C functions that Rust can link against.
+
+    (Pause)
+
+    The cc crate compiles this C file as part of our Rust build process. Build script magic.
+
+    (Transition: "This is the deepest we go - calling wrapped C macros from Rust. Now let's see how all these approaches compare...")
 
  -->
 
@@ -1146,6 +1178,35 @@ part 2 naive            time:   [75.450 µs  75.738 µs  76.043 µs]
 UniFFI: From Rust to Every Language
 ===
 
+<!-- speaker_note: |
+
+    now let's get silly. what if we want to call Rust from... Python?
+    
+    ok that's silly, especially in this case where Rust is calling C, but bear with me here
+    
+    
+
+
+    Everything so far? Rust calling C.
+
+    UniFFI does the opposite: Python, Kotlin, Swift calling Rust.
+    
+    Mozilla built this for Firefox - they wanted to write core logic in Rust and expose it to every platform.
+    
+    (Point to Cargo.toml)
+    
+    We need a shared library - cdylib. That's the artifact other languages will link against.
+    
+    UniFFI requires edition 2021 for now. Small gotcha.
+    
+    (Point to UDL/macros)
+    
+    The UDL file declares your interface. Build script generates the scaffolding. Your Rust code includes it.
+
+    Three lines of boilerplate, and suddenly your Rust functions are callable from four languages.
+
+-->
+
 <!-- new_line -->
 
 <!-- font_size: 2 -->
@@ -1203,6 +1264,26 @@ uniffi::include_scaffolding!("aoc_ffi_day01");
 UniFFI: From Rust to Every Language
 ===
 
+<!-- speaker_note: |
+
+    UniFFI has constraints. You can't pass references across FFI boundaries - no &str, no &[i32]. Everything needs to be owned.
+
+    (Point to code)
+
+    So we write thin wrappers. Take an owned String, call our existing implementation with a reference, convert the error type.
+
+    Three things UniFFI requires:
+
+    Owned types - String not &str. Memory has to be unambiguous across the FFI boundary.
+
+    Custom error handling - thiserror for ergonomics, uniffi::Error for the derive macro.
+
+    And notice the pattern: wrapper delegates to implementation. We're not rewriting logic, just adapting the interface.
+
+    (Transition: "With that setup, calling from Python is almost trivial...")
+
+-->
+
 <!-- new_line -->
 
 <!-- font_size: 2 -->
@@ -1241,6 +1322,21 @@ pub fn uniffi_process_rust_sort(input: String) -> Result<i32, AocError> {
 
 Python Bindings via UniFFI
 ===
+
+<!-- speaker_note: |
+
+    Two commands. Build the Rust library. Generate Python bindings.
+    (Point to uniffi-bindgen command)
+
+    UniFFI reads the UDL, inspects the compiled library, and generates a Python module that uses ctypes under the hood.
+
+    (Wait for Python code)
+
+    And now? Just import and call.
+
+    All six implementations - Rust sort, C qsort, C++ sort, naive loop, Rust HashMap, uthash - exposed to Python with identical APIs.
+    Same Rust code. Zero Python-specific logic.
+-->
 
 <!-- new_line -->
 
@@ -1302,6 +1398,25 @@ uthash  = aoc_ffi_day01.uniffi_process_part_2_uthash(sample)  # 31
 Python Bindings via UniFFI
 ===
 
+<!-- speaker_note: |
+
+    "Error handling just works"
+
+    Rust's Result types become Python exceptions automatically.
+
+    (Point to try/except)
+
+    Our AocError from Rust? Caught as aoc_ffi_day01.AocError in Python.
+    This is the UniFFI value proposition:
+
+    One shared library. One UDL file. Four languages - Python, Kotlin, Swift, Ruby.
+
+    No hand-written bindings. No ctypes boilerplate. One command per language.
+
+    (Transition: "Python was easy. Kotlin? Also surprisingly smooth...")
+
+-->
+
 <!-- new_line -->
 
 <!-- font_size: 2 -->
@@ -1331,6 +1446,29 @@ except aoc_ffi_day01.AocError as e:
 
 Kotlin Bindings via UniFFI
 ===
+
+<!-- speaker_note: | 
+
+    and now for a real use case, calling Rust (and maybe a lower level c library) from Kotlin. I'm glad I started with Python to get something working with UniFFI as Kotlin was a little bit more difficult but not too bad
+    
+    
+    
+    "Same library, JVM target"
+
+    Same command. Different language flag. Now we're targeting the JVM through Kotlin.
+
+    (Point to uniffi-bindgen)
+
+    UniFFI generates Kotlin code that uses JNA - Java Native Access. Different FFI mechanism than Python's ctypes, but same .so file.
+
+    (Wait for Kotlin code)
+
+    Import and call. Identical pattern to Python.
+
+    All our Rust implementations - sorting, hash tables - now callable from Android, server-side Kotlin, anywhere the JVM runs.
+
+
+-->
 
 <!-- new_line -->
 
@@ -1379,6 +1517,26 @@ val hashmap  = uniffiProcessPart2Hashmap(sample) // 31
 Kotlin Bindings via UniFFI
 ===
 
+<!-- speaker_note: |
+
+    "Kotlin conventions" - idioms in every language
+
+    UniFFI isn't just translating types - it's adapting to language conventions.
+
+    Snake case becomes camel case. uniffi_process_rust_sort becomes uniffiProcessRustSort.
+
+    (Point to error handling)
+
+    And error handling? Same as Python. Rust Result becomes Kotlin exceptions.
+
+    Key insight: Python uses ctypes. Kotlin uses JNA. But we wrote the Rust code once.
+
+    UniFFI handles the platform differences.
+
+    (Transition: "Python was easy. Kotlin was smooth. Swift... was a nightmare.")
+
+-->
+
 <!-- new_line -->
 
 <!-- font_size: 2 -->
@@ -1407,6 +1565,41 @@ mechanisms, same generated shared library.
 
 Swift Bindings via UniFFI
 ===
+
+<!-- speaker_note: | 
+
+    Swift however, was kind of a nightmare. And I was working directly on my Mac, not on Linux/devcontainer. I found it even worse inside of Nix but ultiimately solved the problem with another container because this is essentially a cross-compilation problem
+
+    conflicting glibc
+    
+    
+    "Swift... was different"
+
+    Same command. Language flag: swift. But UniFFI generates three files instead of one.
+
+    (Point to files list)
+
+    Swift needs a C bridging header and a module map. It doesn't have ctypes or JNA - it goes through Objective-C interop.
+
+    (Wait for Swift code)
+
+    The API looks clean - named parameters, typed errors, do/catch blocks. Very Swift-like.
+
+    (Wait for compile command)
+
+    But compiling? Pain.
+
+    You need to manually link the library, import the Objective-C header, set the library path.
+
+    Python? Just import. Kotlin? Just import. Swift? Build system archaeology.
+
+    (Pause for effect)
+
+    And this is on macOS with native tooling. On Linux? Even worse. glibc conflicts, cross-compilation hell.
+
+    (Transition: "I eventually containerized it. Which brings us to lessons learned...")
+
+-->
 
 <!-- font_size: 2 -->
 
@@ -1464,6 +1657,51 @@ LD_LIBRARY_PATH=. ./test_swift
 Lessons Learned
 ===
 
+<!-- speaker_note: |
+
+    "Day 1 is intentionally trivial - we don't NEED FFI here. That's the point. I'm using a simple problem to focus on the FFI mechanics without algorithm complexity distracting us. The benchmarks confirm what we expect: for tiny datasets, everything's fast enough. But now we understand HOW to integrate C, measure it, and make informed decisions on real problems."
+
+    Safe FFI wrapper patterns
+
+    Callback marshalling footguns (overflow bug)
+
+    Trait-based abstractions
+
+    Proper benchmarking discipline
+
+    reinforce "measure, don't assume" and "use the right tool for the job."
+
+    FFI unsurprisingly didn't help but surprisingly wasn't as bad as you might expect
+    
+    
+    "What I learned breaking things"
+
+    (Wait for first bullet)
+
+    Cross-platform FFI is a minefield. .so on Linux, .dylib on macOS, .dll on Windows. Build once, run anywhere? Not with native libraries.
+
+    I automated detection with just - check the platform at build time, not runtime.
+
+    (Wait for tooling bullet)
+
+    Every language has its own quirks. Python in Nix requires venv --copies because of immutable paths. Kotlin's JNA doesn't search the current directory by default.
+    And UniFFI's generated APIs? Don't assume - inspect.
+
+    (Wait for automation bullet)
+
+    Automation saved me. just for task orchestration. Nix for reproducible environments. And documenting everything in CLAUDE.md - because I will forget how I fixed that glibc conflict.
+
+    (Wait for performance bullet)
+
+    Performance surprised me. Pure Rust usually wins. Hash function choice matters more than C vs Rust. And Big-O lies - benchmark your actual data.
+
+    (Wait for FFI bullet)
+
+    FFI makes you resilient. It's not about Rust being better than C. It's about pragmatically bridging to whatever library solves the problem.
+    Choose tools based on context, not dogma.
+
+-->
+
 <!-- font_size: 2 -->
 
 <!-- pause -->
@@ -1506,112 +1744,41 @@ Lessons Learned
 
 <!-- end_slide -->
 
-<!-- skip_slide -->
-
-<!-- font_size: 7 -->
-
-Key Takeaways
-===
-
-<!-- font_size: 5 -->
-
-<!-- pause -->
-
-<!-- new_line -->
-
-<!-- incremental_lists: true -->
-
-1. **Isolate per platform** — Docker volumes, Nix, and gitignored artifacts keep macOS/Linux clean
-
-2. **Automate everything** — Just + Nix + Direnv eliminated "works on my machine"
-
-3. **Document thoroughly** — `CLAUDE.md` saved us (and Claude) multiple times
-
-4. **Inspect generated code** — UniFFI transforms names and error types; verify, don't assume
-
-5. **Rust's ecosystem delivers** — Fast core, battle-tested FFI, and zero-boilerplate bindings via UniFFI
-
-<!-- incremental_lists: false -->
-
-<!-- end_slide -->
-
-<!-- font_size: 7 -->
-
-<!-- skip_slide -->
-
-What Worked Well
-===
-
-<!-- font_size: 5 -->
-
-<!-- pause -->
-
-<!-- new_line -->
-
-✅ **Nix** — Reproducible dev environments across platforms
-
-✅ **UniFFI** — Zero-boilerplate FFI to Python, Kotlin, Swift
-
-✅ **Just** — Simple, powerful task runner (better than Make)
-
-✅ **Docker volumes** — Clean isolation for devcontainers
-
-✅ **Direnv** — Automatic environment activation per directory
-
-✅ **Rust** — Fast, safe core with battle-tested FFI
-
-<!-- end_slide -->
-
-<!-- skip_slide -->
-
-<!-- font_size: 7 -->
-
-Final Thoughts
-===
-
-<!-- font_size: 4 -->
-
-<!-- pause -->
-
-<!-- new_line -->
-
-## Cross-platform FFI development requires:
-
-<!-- new_line -->
-
-<!-- incremental_lists: true -->
-* Patience with tooling quirks (looking at you, JNA)
-* Deep understanding of each platform's conventions
-* Robust automation to catch platform-specific issues
-* Clear documentation for context switching
-* Willingness to debug cryptic errors at 3 AM
-<!-- incremental_lists: false -->
-
-<!-- pause -->
-
-<!-- new_line -->
-
-<!-- new_line -->
-
-### **The juice is worth the squeeze**
-
-<!-- new_line -->
-
-When you need native performance across multiple languages and platforms,
-FFI is still the best tool for the job.
-
-<!-- new_line -->
-
-**Just be ready for the journey.** 🚀
-
-<!-- end_slide -->
-
 
 
 <!-- font_size: 7 -->
 
 What's Next?
 ===
+
+<!-- speaker_note: | 
+
+    "Where this goes next"
+
+    (Wait for Open Source bullet)
+
+    I'm contributing back. LearnXinY has gaps in Dart/Rust FFI documentation. Draft PR is up - adding what I wish existed when I started.
+
+    (Wait for Ongoing Work bullets)
+
+    Still solving problems from this project. Swift in devcontainers? Still fighting glibc conflicts. Docker-based testing is the current approach.
+    swift cross-compilation
+    glibc
+
+    And I'm evaluating Ditto's safer_ffi - it's macro-based, no UDL files, auto-generates C headers. Different tradeoffs than UniFFI.
+
+    (Wait for Upcoming Talks bullet)
+
+    Next chapter: CRDTs. Taking these FFI patterns and applying them to distributed Advent of Code solving with Ditto's conflict-free replicated data types.
+
+    (Pause)
+
+    This is learning in public. The glibc lessons from this AoC project? They're already informing how we build devcontainers at Ditto.
+
+    Nothing is wasted when you document the messy middle. 
+        including half-baked ideas for a talke at your local public meetup
+
+-->
 
 <!-- font_size: 4 -->
 
