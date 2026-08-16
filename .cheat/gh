@@ -1,0 +1,27 @@
+---
+syntax: bash
+tags: [ aoc-ffi, github ]
+---
+# This repo is private -- web search can't see PRs/Issues/runs. Always use gh.
+
+gh pr list
+gh pr list --state all --limit 20
+gh pr view 5
+gh pr view 5 --json title,state,isDraft,headRefName,body
+gh pr diff 5
+gh pr checkout 5
+gh browse                        # open the repo in a browser
+
+gh issue list
+gh issue view 1
+
+# Action runs
+gh run list --limit 10
+gh run view <run-id> --log-failed
+
+# Raw API, for anything the porcelain won't give you
+gh api repos/alycda/aoc-ffi/pulls --jq '.[] | "\(.number) \(.title)"'
+gh api repos/alycda/aoc-ffi/pulls/5/files --jq '.[].filename'
+
+# Pre-approved without a permission prompt in .claude/settings.json:
+#   gh api, gh browse, jj st, jj log, jj show

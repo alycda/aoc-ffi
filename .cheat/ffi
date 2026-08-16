@@ -1,0 +1,50 @@
+---
+syntax: bash
+tags: [ aoc-ffi, ffi, debug ]
+---
+# Debugging "why won't this library load?"
+
+# What symbols does the cdylib actually export?
+nm -D --defined-only aoc-2024-12-01/target/release/libaoc_ffi_day01.so | grep uniffi
+nm -gU aoc-2024-12-01/target/release/libaoc_ffi_day01.dylib | grep uniffi   # macOS
+
+# What does it link against? (the glibc question)
+ldd aoc-2024-12-01/target/release/libaoc_ffi_day01.so
+otool -L aoc-2024-12-01/target/release/libaoc_ffi_day01.dylib               # macOS
+
+# Which glibc versions does it want?
+objdump -T aoc-2024-12-01/target/release/libaoc_ffi_day01.so | grep GLIBC_ | sort -u
+
+# Runtime library search paths
+LD_LIBRARY_PATH=. ./test_swift        # Linux
+DYLD_LIBRARY_PATH=. ./test_swift      # macOS (SIP strips this in some contexts)
+kotlinc -J-Djna.library.path=. ...    # JNA ignores cwd unless told; -J passes JVM -D
+
+# ---------------------------------------------------------------------------
+# Error decoder ring
+# ---------------------------------------------------------------------------
+
+# symbol lookup error: undefined symbol: __tunable_is_initialized, version GLIBC_PRIVATE
+#   -> A Nix-glibc .so being loaded by a system-glibc tool (2.42 vs 2.39).
+#      Mixing glibc versions is cross-compilation. Don't. Isolate instead.
+#      main today: `just uniffi-test-swift` skips on Linux+Nix.
+#      pending PR #5: `just uniffi-test-swift-docker` runs it in swift:bookworm.
+docker run --rm -v "$(pwd)/aoc-2024-12-01:/workspace" -w /workspace/bindings/swift \
+    swift:bookworm bash -c "swiftc -o test_swift ../../tests/swift/test_swift_bindings.swift \
+    aoc_ffi_day01.swift -import-objc-header aoc_ffi_day01FFI.h -L . -laoc_ffi_day01 \
+    && LD_LIBRARY_PATH=. ./test_swift"
+
+# UnsatisfiedLinkError: Native library (linux-aarch64/libaoc_ffi_day01.so) not found
+#   -> JNA. Set -Djna.library.path=. and check the arch dir matches `uname -m`.
+
+# cannot open shared object file: No such file or directory
+#   -> The .so exists but isn't on the search path, OR you have a .dylib from macOS
+#      sitting in bindings/ after switching platforms. Fix: just clean-bindings
+
+# ---------------------------------------------------------------------------
+# Which FFI mechanism is which, in this repo
+# ---------------------------------------------------------------------------
+#   C qsort      extern "C" + fn ptr        src/lib.rs
+#   GLib         glib-sys crate (optional)  cargo feature "glib", on by default
+#   uthash       cc crate compiles .c       build.rs -> src/uthash_wrapper.c
+#   Py/Kt/Swift  UniFFI generates bindings  see: cheat uniffi

@@ -1,0 +1,38 @@
+---
+syntax: bash
+tags: [ aoc-ffi, nix, devcontainer ]
+---
+nix-shell                    # enter the dev shell (shell.nix)
+direnv allow                 # or let .envrc ("use nix") do it automatically
+echo $IN_NIX_SHELL           # non-empty inside the shell; justfile branches on it
+
+# Rebuild the devcontainer's home-manager config
+just rebuild                 # home-manager switch -b backup -f .devcontainer/home.nix
+
+# ---------------------------------------------------------------------------
+# Nix + Python: error: externally-managed-environment
+#   "This command has been disabled as it tries to modify the immutable
+#    /nix/store filesystem."
+# Fix: an isolated venv built with --copies (NOT symlinks into /nix/store).
+# shellHook does this for you; do it by hand only if .venv got wedged.
+# ---------------------------------------------------------------------------
+rm -rf .venv
+python3 -m venv .venv --copies
+source .venv/bin/activate
+which python                 # MUST contain .venv, not /nix/store
+pip install uniffi-bindgen==0.28.3
+
+# ---------------------------------------------------------------------------
+# Env vars set by the Nix shell / home-manager
+# ---------------------------------------------------------------------------
+echo $LIBCLANG_PATH          # bindgen needs this (llvmPackages.libclang.lib)
+echo $CHEAT_CONFIG_PATH      # .devcontainer/cheat/conf.yml
+echo $CLASSPATH              # JNA jar, downloaded by shellHook into ~/.m2
+
+# Nix ships its own glibc. System tools (Swift) ship another. Mixing them is
+# cross-compilation -- see: cheat ffi
+
+# Devcontainer isolates per-platform build artifacts in Docker volumes:
+#   .venv/                    -> aoc-ffi-venv
+#   aoc-2024-12-01/target/    -> aoc-ffi-target
+# so macOS and Linux never fight over .dylib vs .so.

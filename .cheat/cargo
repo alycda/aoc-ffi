@@ -1,0 +1,50 @@
+---
+syntax: bash
+tags: [ aoc-ffi, rust, cargo ]
+---
+# Preferred entrypoints (justfile sets working-directory: aoc-2024-12-01)
+just aoc-test
+just aoc-bench
+just aoc-run
+just build-lib              # cargo build --release --lib
+
+# No workspace on main yet -- run cargo from the crate dir
+# (pending PR #3 adds a root [workspace] with members = ["aoc-202*"])
+cd aoc-2024-12-01 && cargo test
+
+# ---------------------------------------------------------------------------
+# Features: glib is default-ON. Swift needs it OFF.
+# ---------------------------------------------------------------------------
+cargo build --release --lib                        # with GHashTable
+cargo build --release --lib --no-default-features  # without (Swift path)
+cargo test --no-default-features                   # skips process_part_2_glib
+
+# ---------------------------------------------------------------------------
+# Benchmarks (criterion, harness = false)
+# ---------------------------------------------------------------------------
+cargo bench                      # benches/REAL_INPUT.txt is committed, despite
+                                 # benches/.gitignore listing it (added first)
+cargo bench -- 'rust sort'       # filter by bench name
+open aoc-2024-12-01/target/criterion/report/index.html
+
+# Part 2 hash strategies, slowest -> fastest:
+#   naive O(n*m) filter | std HashMap (SipHash) | ahash | GLib GHashTable | uthash
+# Hash function choice matters more than the language. Benchmark YOUR data.
+
+# ---------------------------------------------------------------------------
+# The API on main: free functions, no generic dispatch
+# ---------------------------------------------------------------------------
+#   part 1: process_c_qsort | process_rust_sort
+#   part 2: process_part_2 (naive) | _hashmap | _ahash | _glib | _uthash
+cargo test test_part_1_agree     # C qsort and Rust sort agree
+cargo test test_all_part_2_agree # all five part-2 strategies agree
+
+# NOTE: the zero-cost `trait Sorter` / `solve::<S>` refactor (CSort, NativeSort)
+# is NOT on main -- PR #2 was closed. PR #8 (StableSort/UnstableSort) stacks on
+# the 2024-12-01-zero-cost-abstraction branch, not main. If that work lands:
+#   cargo test test_all_agree
+#   cargo asm --lib 'aoc_ffi_day01::solve'    # cargo-asm is NOT in shell.nix
+
+# Watch loop -- the .vscode "Watch" task
+bacon test
+bacon run
