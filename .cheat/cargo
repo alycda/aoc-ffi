@@ -22,7 +22,8 @@ cargo test --no-default-features                   # skips process_part_2_glib
 # ---------------------------------------------------------------------------
 # Benchmarks (criterion, harness = false)
 # ---------------------------------------------------------------------------
-cargo bench                      # needs benches/REAL_INPUT.txt -- GITIGNORED
+cargo bench                      # benches/REAL_INPUT.txt is committed, despite
+                                 # benches/.gitignore listing it (added first)
 cargo bench -- 'rust sort'       # filter by bench name
 open aoc-2024-12-01/target/criterion/report/index.html
 
@@ -31,14 +32,18 @@ open aoc-2024-12-01/target/criterion/report/index.html
 # Hash function choice matters more than the language. Benchmark YOUR data.
 
 # ---------------------------------------------------------------------------
-# Sorters (zero-cost marker types feeding solve::<S>)
+# The API on main: free functions, no generic dispatch
 # ---------------------------------------------------------------------------
-#   main today:    CSort | NativeSort
-#   pending PR #8: CSort | StableSort (timsort) | UnstableSort (pdqsort)
-cargo test test_both_agree       # renamed to test_all_agree in PR #8
+#   part 1: process_c_qsort | process_rust_sort
+#   part 2: process_part_2 (naive) | _hashmap | _ahash | _glib | _uthash
+cargo test test_part_1_agree     # C qsort and Rust sort agree
+cargo test test_all_part_2_agree # all five part-2 strategies agree
 
-# Prove the monomorphization claim (cargo-asm is NOT in shell.nix)
-cargo asm --lib 'aoc_ffi_day01::solve'
+# NOTE: the zero-cost `trait Sorter` / `solve::<S>` refactor (CSort, NativeSort)
+# is NOT on main -- PR #2 was closed. PR #8 (StableSort/UnstableSort) stacks on
+# the 2024-12-01-zero-cost-abstraction branch, not main. If that work lands:
+#   cargo test test_all_agree
+#   cargo asm --lib 'aoc_ffi_day01::solve'    # cargo-asm is NOT in shell.nix
 
 # Watch loop -- the .vscode "Watch" task
 bacon test
