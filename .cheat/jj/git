@@ -1,0 +1,28 @@
+---
+syntax: bash
+tags: [ aoc-ffi, jj, vcs ]
+---
+# Getting a jj change onto a GitHub PR.
+# Bookmarks are how jj talks to git branches -- that is the part that bites.
+
+jj git fetch
+jj new main -m "feat(ffi): ..."      # start work on top of main
+jj describe -m "..."                 # amend the current change's message
+jj st
+jj show
+
+# Push
+jj bookmark set my-branch -r @       # point a bookmark at the current change
+jj git push --bookmark my-branch --allow-new
+jj git push -c @                     # shorthand: create bookmark from @ and push
+
+# Move a bookmark forward after more work
+jj bookmark set my-branch -r @ && jj git push --bookmark my-branch
+
+# Undo
+jj undo                              # last operation
+jj op log                            # find an older operation
+jj op restore <op-id>                # rewind to it
+
+# This repo prefers jj; VS Code has git.enabled=false and only the
+# Jujutsu SCM provider. See also: cheat jj/log
